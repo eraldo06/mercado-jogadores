@@ -138,3 +138,23 @@ export function OrdenacaoJogador(
     options,
   );
 }
+
+const CARACTERES_DE_NOME_DE_CLUBE = /^[\p{L} .-]+$/u;
+
+export function NomeDeClube(options?: ValidationOptions): PropertyDecorator {
+  return ValidateBy(
+    {
+      name: 'nomeDeClube',
+      validator: {
+        validate: (valor: unknown) =>
+          typeof valor === 'string' &&
+          CARACTERES_DE_NOME_DE_CLUBE.test(valor) &&
+          contarPalavras(valor) >= 2 &&
+          contarPalavras(valor) <= 5,
+        defaultMessage: (args: ValidationArguments) =>
+          `${args.property} deve ter de 2 a 5 palavras, com apenas letras, espaços, hífen e ponto`,
+      },
+    },
+    options,
+  );
+}
