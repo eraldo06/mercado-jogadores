@@ -10,3 +10,7 @@ export type Atributos = {
   defesa: number;
   fisico: number;
 };
+
+export const CONDICOES: Condicao[] = ['APTO', 'MAL_CONDICIONADO', 'DOENTE'];
+
+export const POSICOES: Posicao[] = ['GOL', 'ZAG', 'LAT', 'MEI', 'ATA'];
