@@ -1,13 +1,11 @@
 import { INestApplication } from '@nestjs/common';
-import { Test } from '@nestjs/testing';
-import type { Server } from 'http';
-import request from 'supertest';
-import { AppModule } from '../src/app.module';
-import { configurarApp } from '../src/app.setup';
 import { PrismaService } from '../src/prisma/prisma.service';
 import {
+  apiDe,
   ErroJson,
+  iniciarApp,
   JogadorJson,
+  limparBanco,
   ListaJogadoresJson,
   nomesDe,
   tipar,
@@ -43,7 +41,7 @@ describe('Jogadores (e2e)', () => {
   let app: INestApplication;
   let prisma: PrismaService;
 
-  const api = () => request(app.getHttpServer() as Server);
+  const api = () => apiDe(app);
   const criar = (extra?: Corpo) =>
     tipar<JogadorJson>(
       api().post('/api/v1/players').send(jogadorValido(extra)),
@@ -68,13 +66,7 @@ describe('Jogadores (e2e)', () => {
   }
 
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile();
-    app = moduleRef.createNestApplication({ bodyParser: false });
-    configurarApp(app, process.env.CORS_ORIGIN as string);
-    await app.init();
-    prisma = app.get(PrismaService);
+    ({ app, prisma } = await iniciarApp());
   });
 
   afterAll(async () => {
@@ -82,9 +74,7 @@ describe('Jogadores (e2e)', () => {
   });
 
   beforeEach(async () => {
-    await prisma.$executeRawUnsafe(
-      'TRUNCATE TABLE duelos_partida, partidas, escalacoes, transacoes, contratos, jogadores, clubes RESTART IDENTITY CASCADE',
-    );
+    await limparBanco(prisma);
   });
 
   describe('B01 – validação do cadastro', () => {
