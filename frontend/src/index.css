@@ -1,0 +1,48 @@
+:root {
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+  color: #1f1b24;
+  background: #f7f7f8;
+  line-height: 1.5;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+}
+
+.cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
+  background: #fff;
+  border-bottom: 1px solid #e5e4e7;
+}
+
+.cabecalho nav {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cabecalho nav a {
+  color: #4b4456;
+  text-decoration: none;
+}
+
+.cabecalho nav a.active {
+  color: #1f1b24;
+  font-weight: 600;
+}
+
+.conteudo {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
