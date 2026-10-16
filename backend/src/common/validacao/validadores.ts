@@ -4,6 +4,7 @@ import {
   ValidationArguments,
   ValidationOptions,
 } from 'class-validator';
+import { interpretarDataBrasilia } from '../../domain/data-brasilia';
 import {
   contarCaracteres,
   contarPalavras,
@@ -139,6 +140,7 @@ export function OrdenacaoJogador(
   );
 }
 
+const TIPOS_DE_TRANSACAO = ['COMPRA', 'VENDA'];
 const CARACTERES_DE_NOME_DE_CLUBE = /^[\p{L} .-]+$/u;
 
 export function NomeDeClube(options?: ValidationOptions): PropertyDecorator {
@@ -153,6 +155,47 @@ export function NomeDeClube(options?: ValidationOptions): PropertyDecorator {
           contarPalavras(valor) <= 5,
         defaultMessage: (args: ValidationArguments) =>
           `${args.property} deve ter de 2 a 5 palavras, com apenas letras, espaços, hífen e ponto`,
+      },
+    },
+    options,
+  );
+}
+
+export function DataBrasilia(options?: ValidationOptions): PropertyDecorator {
+  return ValidateBy(
+    {
+      name: 'dataBrasilia',
+      validator: {
+        validate: (valor: unknown) =>
+          typeof valor === 'string' && interpretarDataBrasilia(valor) !== null,
+        defaultMessage: (args: ValidationArguments) =>
+          `${args.property} deve estar no formato AAAA-MM-DDTHH:MM-03:00, com data e hora existentes`,
+      },
+    },
+    options,
+  );
+}
+
+export function TiposDeTransacao(
+  options?: ValidationOptions,
+): PropertyDecorator {
+  return ValidateBy(
+    {
+      name: 'tiposDeTransacao',
+      validator: {
+        validate: (valor: unknown) => {
+          if (typeof valor !== 'string') {
+            return false;
+          }
+          const tipos = valor.split(',');
+          return (
+            tipos.length <= 2 &&
+            new Set(tipos).size === tipos.length &&
+            tipos.every((tipo) => TIPOS_DE_TRANSACAO.includes(tipo))
+          );
+        },
+        defaultMessage: (args: ValidationArguments) =>
+          `${args.property} aceita COMPRA e VENDA, separados por vírgula, sem repetir`,
       },
     },
     options,

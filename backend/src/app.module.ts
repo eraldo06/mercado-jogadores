@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ClubsModule } from './clubs/clubs.module';
+import { MarketModule } from './market/market.module';
 import { PlayersModule } from './players/players.module';
 import { PrismaModule } from './prisma/prisma.module';
 
@@ -10,6 +11,7 @@ import { PrismaModule } from './prisma/prisma.module';
     PrismaModule,
     PlayersModule,
     ClubsModule,
+    MarketModule,
   ],
 })
 export class AppModule {}
