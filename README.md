@@ -6,7 +6,7 @@ Sistema "Passe": mercado de jogadores de uma liga de futebol fictícia. Clubes c
 
 Ubuntu 24.04 com as ferramentas abaixo.
 
-- **Node.js 22 LTS** com npm (versão 22.x). Testado com Node.js 22.11.
+- **Node.js 22 LTS** com npm, versão **22.12 ou mais recente** (o Vite 8 exige 22.12). Testado com Node.js 22.23.3 e npm 10.9.
 - **Docker Engine** com **Docker Compose v2** (`docker compose`), usável sem `sudo`.
 - **PostgreSQL 16**: não precisa instalar; sobe pelo Docker Compose (`postgres:16-alpine`).
 
