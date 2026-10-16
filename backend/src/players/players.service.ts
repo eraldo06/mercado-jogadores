@@ -201,9 +201,14 @@ export class PlayersService {
       );
     }
 
-    const atualizado = await this.prisma.jogador.update({
-      where: { id },
-      data: { condicao: dto.condition },
+    const atualizado = await this.prisma.$transaction(async (tx) => {
+      if (dto.condition === 'DOENTE') {
+        await tx.escalacao.deleteMany({ where: { jogadorId: id } });
+      }
+      return tx.jogador.update({
+        where: { id },
+        data: { condicao: dto.condition },
+      });
     });
     return toJogadorResposta(atualizado);
   }
