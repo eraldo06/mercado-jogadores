@@ -16,7 +16,22 @@ export class ErroApi extends Error {
 type OpcoesRequisicao = {
   metodo?: Metodo;
   corpo?: unknown;
+  consulta?: Record<string, string | number | boolean | undefined>;
 };
+
+type ValorConsulta = string | number | boolean | undefined;
+
+export function montarConsulta(
+  parametros: Record<string, ValorConsulta> = {},
+): string {
+  const partes = Object.entries(parametros)
+    .filter(([, valor]) => valor !== undefined && valor !== '')
+    .map(
+      ([chave, valor]) =>
+        `${encodeURIComponent(chave)}=${encodeURIComponent(String(valor))}`,
+    );
+  return partes.length > 0 ? `?${partes.join('&')}` : '';
+}
 
 async function mensagemDe(resposta: Response): Promise<string> {
   const corpo = (await resposta.json().catch(() => null)) as {
@@ -27,22 +42,46 @@ async function mensagemDe(resposta: Response): Promise<string> {
     : `Erro ${resposta.status}`;
 }
 
-export async function requisitar<T>(
+async function enviar(
   caminho: string,
-  { metodo = 'GET', corpo }: OpcoesRequisicao = {},
-): Promise<T> {
-  const resposta = await fetch(`${BASE_API}${caminho}`, {
-    method: metodo,
-    headers:
-      corpo === undefined ? undefined : { 'Content-Type': 'application/json' },
-    body: corpo === undefined ? undefined : JSON.stringify(corpo),
-  });
+  { metodo = 'GET', corpo, consulta = {} }: OpcoesRequisicao,
+  aceitar: string,
+): Promise<Response> {
+  const cabecalhos: Record<string, string> = { Accept: aceitar };
+  if (corpo !== undefined) {
+    cabecalhos['Content-Type'] = 'application/json';
+  }
+
+  const resposta = await fetch(
+    `${BASE_API}${caminho}${montarConsulta(consulta)}`,
+    {
+      method: metodo,
+      headers: cabecalhos,
+      body: corpo === undefined ? undefined : JSON.stringify(corpo),
+    },
+  );
 
   if (!resposta.ok) {
     throw new ErroApi(resposta.status, await mensagemDe(resposta));
   }
+  return resposta;
+}
+
+export async function requisitar<T>(
+  caminho: string,
+  opcoes: OpcoesRequisicao = {},
+): Promise<T> {
+  const resposta = await enviar(caminho, opcoes, 'application/json');
   if (resposta.status === 204) {
     return undefined as T;
   }
   return (await resposta.json()) as T;
+}
+
+export async function requisitarTexto(
+  caminho: string,
+  opcoes: OpcoesRequisicao = {},
+): Promise<string> {
+  const resposta = await enviar(caminho, opcoes, 'text/csv');
+  return resposta.text();
 }
