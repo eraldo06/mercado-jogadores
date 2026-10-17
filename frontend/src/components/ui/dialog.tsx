@@ -9,7 +9,7 @@ type PropsDialog = {
   titulo: string;
   descricao?: string;
   rodape?: ReactNode;
-  largura?: 'md' | 'lg';
+  largura?: 'md' | 'lg' | 'xl';
   children?: ReactNode;
 };
 
@@ -30,7 +30,11 @@ export function Dialog({
           data-slot="dialog"
           className={cn(
             'fixed top-1/2 left-1/2 z-50 flex max-h-[90vh] w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col gap-5 overflow-y-auto rounded-lg border border-border bg-popover p-6 text-popover-foreground shadow-lg outline-none',
-            largura === 'md' ? 'max-w-md' : 'max-w-lg',
+            largura === 'md'
+              ? 'max-w-md'
+              : largura === 'lg'
+                ? 'max-w-lg'
+                : 'max-w-3xl',
           )}
         >
           <div className="flex flex-col gap-1.5 pr-8">

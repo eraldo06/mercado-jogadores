@@ -1,27 +1,42 @@
-import { ArrowUpDown, Search, Users } from 'lucide-react';
+import { ArrowUpDown, Plus, Search, Users } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router';
+import { toast } from 'sonner';
 import { ErroApi } from '../../api/cliente';
-import { Button } from '../../components/ui/button';
-import { Select, type OpcaoSelect } from '../../components/ui/select';
+import type { Jogador } from '../../api/jogadores';
 import { CabecalhoPagina } from '../../components/compartilhados/cabecalho-pagina';
 import { TabelaDados } from '../../components/compartilhados/tabela-dados';
+import { Button } from '../../components/ui/button';
+import { Select, type OpcaoSelect } from '../../components/ui/select';
 import { useClubes } from '../../consultas/clubes';
+import { useEscalacao } from '../../consultas/liga';
 import {
+  useAlterarCondicao,
   useContagemJogadores,
+  useCriarJogador,
+  useEditarJogador,
+  useExcluirJogador,
   useListaJogadores,
 } from '../../consultas/jogadores';
 import { cn } from '../../lib/utils';
 import { BarraFiltros, ChipsFiltros } from './barra-filtros';
-import { colunasJogadores } from './tabela-jogadores';
+import { Alert } from '../../components/ui/alert';
+import { Badge } from '../../components/ui/badge';
+import { ConfirmacaoDialog } from '../../components/compartilhados/confirmacao-dialog';
+import { DialogCondicao } from './dialog-condicao';
+import { FormularioJogador } from './formulario-jogador';
+import { JogadorCadastradoDialog } from './jogador-cadastrado-dialog';
 import { Paginacao } from './paginacao';
+import { colunasJogadores } from './tabela-jogadores';
 import {
+  escreverEstado,
   filtrosAtivos,
   filtrosContagem,
   filtrosLista,
-  escreverEstado,
   lerEstado,
+  ROTULO_CONDICAO,
   ROTULO_ORDEM,
+  ROTULO_POSICAO,
   type AbaJogadores,
   type EstadoJogadores,
   type OrdemJogadores,
@@ -41,6 +56,9 @@ function mensagemDeErro(erro: unknown): string {
   }
   return 'Não foi possível carregar os jogadores. Verifique a conexão e tente de novo.';
 }
+
+type FormularioAberto =
+  { modo: 'criar' } | { modo: 'editar'; jogador: Jogador } | null;
 
 export function PaginaJogadores() {
   const [parametros, definirParametros] = useSearchParams();
@@ -107,6 +125,40 @@ export function PaginaJogadores() {
   const abaBloqueada = (aba: AbaJogadores) =>
     aba === 'livres' && estado.clube !== undefined;
 
+  const [formulario, setFormulario] = useState<FormularioAberto>(null);
+  const [condicaoDe, setCondicaoDe] = useState<Jogador | null>(null);
+  const [cadastrado, setCadastrado] = useState<Jogador | null>(null);
+  const criar = useCriarJogador();
+  const editar = useEditarJogador();
+  const alterarCondicao = useAlterarCondicao();
+  const excluir = useExcluirJogador();
+  const [excluirDe, setExcluirDe] = useState<Jogador | null>(null);
+  const escalacaoDoClube = useEscalacao(
+    condicaoDe?.club_id ?? null,
+    condicaoDe !== null,
+  );
+  const titularDoClube =
+    escalacaoDoClube.data?.players.some(
+      (jogador) => jogador.id === condicaoDe?.id,
+    ) ?? false;
+
+  const abrirCriar = () => {
+    criar.reset();
+    setFormulario({ modo: 'criar' });
+  };
+  const abrirEditar = (jogador: Jogador) => {
+    editar.reset();
+    setFormulario({ modo: 'editar', jogador });
+  };
+  const abrirExcluir = (jogador: Jogador) => {
+    excluir.reset();
+    setExcluirDe(jogador);
+  };
+  const abrirCondicao = (jogador: Jogador) => {
+    alterarCondicao.reset();
+    setCondicaoDe(jogador);
+  };
+
   const opcoesOrdem: OpcaoSelect[] = ORDENS.map((ordem) => ({
     valor: ordem,
     rotulo: ROTULO_ORDEM[ordem],
@@ -124,6 +176,12 @@ export function PaginaJogadores() {
         icone={Users}
         titulo="Jogadores"
         descricao="Cadastre jogadores, acompanhe os indicadores e compre os que estão livres."
+        acao={
+          <Button onClick={abrirCriar}>
+            <Plus />
+            Novo jogador
+          </Button>
+        }
       />
 
       <BarraFiltros
@@ -195,7 +253,11 @@ export function PaginaJogadores() {
         </div>
 
         <TabelaDados
-          colunas={colunasJogadores(clubesPorId)}
+          colunas={colunasJogadores(clubesPorId, {
+            aoEditar: abrirEditar,
+            aoAlterarCondicao: abrirCondicao,
+            aoExcluir: abrirExcluir,
+          })}
           linhas={lista.data?.data ?? []}
           chaveLinha={(jogador) => jogador.id}
           estado={estadoTabela}
@@ -235,6 +297,128 @@ export function PaginaJogadores() {
         Overall e valor de mercado são calculados a cada consulta. A busca
         ignora maiúsculas, minúsculas e acentos.
       </p>
+
+      {formulario?.modo === 'criar' && (
+        <FormularioJogador
+          modo="criar"
+          aberto
+          aoFechar={() => setFormulario(null)}
+          carregando={criar.isPending}
+          erroApi={criar.error}
+          aoSalvar={(dados) =>
+            criar.mutate(dados, {
+              onSuccess: (jogador) => {
+                setFormulario(null);
+                setCadastrado(jogador);
+              },
+            })
+          }
+        />
+      )}
+
+      {formulario?.modo === 'editar' && (
+        <FormularioJogador
+          key={formulario.jogador.id}
+          modo="editar"
+          aberto
+          jogador={formulario.jogador}
+          emClube={formulario.jogador.club_id !== null}
+          aoFechar={() => setFormulario(null)}
+          carregando={editar.isPending}
+          erroApi={editar.error}
+          aoSalvar={(dados) =>
+            editar.mutate(
+              { id: formulario.jogador.id, dados },
+              {
+                onSuccess: (jogador) => {
+                  setFormulario(null);
+                  toast.success('Jogador atualizado', {
+                    description: `${jogador.name} foi atualizado.`,
+                  });
+                },
+              },
+            )
+          }
+        />
+      )}
+
+      {condicaoDe && (
+        <DialogCondicao
+          key={condicaoDe.id}
+          aberto
+          aoFechar={() => setCondicaoDe(null)}
+          jogador={condicaoDe}
+          nomeDoClube={
+            condicaoDe.club_id === null
+              ? undefined
+              : clubesPorId.get(condicaoDe.club_id)?.name
+          }
+          titular={titularDoClube}
+          carregando={alterarCondicao.isPending}
+          erroApi={alterarCondicao.error}
+          aoSalvar={(condicao) =>
+            alterarCondicao.mutate(
+              { id: condicaoDe.id, condicao },
+              {
+                onSuccess: (jogador) => {
+                  setCondicaoDe(null);
+                  toast.success('Condição alterada', {
+                    description: `${jogador.name} agora está ${ROTULO_CONDICAO[jogador.condition]}.`,
+                  });
+                },
+              },
+            )
+          }
+        />
+      )}
+
+      {excluirDe && (
+        <ConfirmacaoDialog
+          key={excluirDe.id}
+          aberto
+          aoAlterarAbertura={(aberto) => !aberto && setExcluirDe(null)}
+          titulo={`Excluir ${excluirDe.name}?`}
+          descricao="O jogador sai da lista e da busca, mas as transações e as partidas antigas dele continuam como foram gravadas."
+          textoConfirmar="Excluir jogador"
+          destrutiva
+          carregando={excluir.isPending}
+          aoConfirmar={() =>
+            excluir.mutate(excluirDe.id, {
+              onSuccess: () => {
+                const nome = excluirDe.name;
+                setExcluirDe(null);
+                toast.success('Jogador excluído', {
+                  description: `${nome} saiu da lista. Transações e partidas antigas dele continuam gravadas.`,
+                });
+              },
+            })
+          }
+        >
+          <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted-subtle p-3">
+            <div className="flex flex-col">
+              <span className="font-medium">{excluirDe.name}</span>
+              <span className="text-xs text-muted-foreground">
+                {excluirDe.position} · {ROTULO_POSICAO[excluirDe.position]} ·{' '}
+                {excluirDe.age} anos
+              </span>
+            </div>
+            <Badge>{excluirDe.club_id === null ? 'Livre' : 'Em clube'}</Badge>
+          </div>
+          {excluir.error && (
+            <Alert
+              variante="destrutivo"
+              titulo="Não foi possível excluir o jogador"
+            >
+              {mensagemDeErro(excluir.error)}
+            </Alert>
+          )}
+        </ConfirmacaoDialog>
+      )}
+
+      <JogadorCadastradoDialog
+        jogador={cadastrado}
+        aoFechar={() => setCadastrado(null)}
+      />
     </div>
   );
 }

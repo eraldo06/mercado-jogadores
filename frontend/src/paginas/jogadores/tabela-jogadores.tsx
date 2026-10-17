@@ -7,14 +7,22 @@ import { CondicaoBadge } from '../../components/compartilhados/condicao-badge';
 import { Badge } from '../../components/ui/badge';
 import { moeda } from '../../lib/formatar';
 import { ROTULO_POSICAO } from './filtros';
+import { MenuAcoesJogador } from './menu-acoes-jogador';
 
 export type ClubeNaTabela = {
   name: string;
   acronym: string;
 };
 
+type AcoesJogador = {
+  aoEditar: (jogador: Jogador) => void;
+  aoAlterarCondicao: (jogador: Jogador) => void;
+  aoExcluir: (jogador: Jogador) => void;
+};
+
 export function colunasJogadores(
   clubesPorId: Map<number, ClubeNaTabela>,
+  acoes: AcoesJogador,
 ): ColunaTabela<Jogador>[] {
   return [
     {
@@ -105,6 +113,20 @@ export function colunasJogadores(
           </div>
         );
       },
+    },
+    {
+      chave: 'acoes',
+      titulo: '',
+      alinhamento: 'direita',
+      className: 'w-12',
+      render: (jogador) => (
+        <MenuAcoesJogador
+          jogador={jogador}
+          aoEditar={acoes.aoEditar}
+          aoAlterarCondicao={acoes.aoAlterarCondicao}
+          aoExcluir={acoes.aoExcluir}
+        />
+      ),
     },
   ];
 }
