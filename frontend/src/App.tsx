@@ -1,6 +1,8 @@
 import { Navigate, Route, Routes } from 'react-router';
 import { AppShell } from './components/compartilhados/app-shell';
 import { PaginaJogadores } from './paginas/jogadores/pagina-jogadores';
+import { PaginaClube } from './paginas/clubes/pagina-clube';
+import { PaginaClubes } from './paginas/clubes/pagina-clubes';
 
 function EmConstrucao({ titulo }: { titulo: string }) {
   return (
@@ -19,8 +21,8 @@ export default function App() {
       <Route element={<AppShell />}>
         <Route index element={<Navigate to="/jogadores" replace />} />
         <Route path="jogadores" element={<PaginaJogadores />} />
-        <Route path="clubes" element={<EmConstrucao titulo="Clubes" />} />
-        <Route path="clubes/:id" element={<EmConstrucao titulo="Clube" />} />
+        <Route path="clubes" element={<PaginaClubes />} />
+        <Route path="clubes/:id" element={<PaginaClube />} />
         <Route path="partidas" element={<EmConstrucao titulo="Partidas" />} />
         <Route
           path="classificacao"

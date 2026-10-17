@@ -48,17 +48,24 @@ export function Button({
   children,
   ...props
 }: PropsBotao) {
-  const Componente = asChild ? Slot : 'button';
+  const classes = cn(botaoVariantes({ variante, tamanho }), className);
+  if (asChild) {
+    return (
+      <Slot data-slot="button" className={classes} {...props}>
+        {children}
+      </Slot>
+    );
+  }
   return (
-    <Componente
+    <button
       data-slot="button"
-      className={cn(botaoVariantes({ variante, tamanho }), className)}
+      className={classes}
       disabled={disabled || carregando}
       aria-busy={carregando || undefined}
       {...props}
     >
       {carregando && <LoaderCircle className="animate-spin" />}
       {children}
-    </Componente>
+    </button>
   );
 }
