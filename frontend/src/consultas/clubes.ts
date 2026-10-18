@@ -5,6 +5,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import { clubesApi, type NovoClube, type OrdemClubes } from '../api/clubes';
+import { mercadoApi } from '../api/mercado';
 
 export function useClubes() {
   return useQuery({
@@ -34,6 +35,18 @@ export function useCriarClube() {
     mutationFn: (dados: NovoClube) => clubesApi.criar(dados),
     onSuccess: () => {
       void cliente.invalidateQueries({ queryKey: ['clubes'] });
+    },
+  });
+}
+
+export function useVenderJogador() {
+  const cliente = useQueryClient();
+  return useMutation({
+    mutationFn: (jogadorId: number) => mercadoApi.vender(jogadorId),
+    onSuccess: () => {
+      void cliente.invalidateQueries({ queryKey: ['clubes'] });
+      void cliente.invalidateQueries({ queryKey: ['jogadores'] });
+      void cliente.invalidateQueries({ queryKey: ['escalacao'] });
     },
   });
 }
