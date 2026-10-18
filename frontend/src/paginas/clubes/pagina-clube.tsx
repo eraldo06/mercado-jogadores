@@ -357,7 +357,7 @@ export function PaginaClube() {
       <div
         role="tablist"
         aria-label="Seções do clube"
-        className="flex gap-6 border-b border-border"
+        className="flex gap-4 overflow-x-auto border-b border-border md:gap-6"
       >
         <AbaClube
           ativa={abaAtiva === 'elenco'}

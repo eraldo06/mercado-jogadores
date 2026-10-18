@@ -273,8 +273,8 @@ function FormularioEscalacao({
         </Alert>
       )}
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_20rem]">
-        <section className="flex flex-col rounded-xl border border-border bg-card">
+      <div className="grid min-w-0 gap-6 lg:grid-cols-[1fr_20rem]">
+        <section className="flex min-w-0 flex-col rounded-xl border border-border bg-card">
           <div className="flex items-start justify-between gap-3 p-4">
             <div className="flex flex-col gap-0.5">
               <h2 className="text-base font-semibold">Titulares</h2>

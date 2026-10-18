@@ -1,12 +1,13 @@
 import {
   ListOrdered,
+  Menu,
   RefreshCw,
   Shield,
   Trophy,
   Users,
   Swords,
 } from 'lucide-react';
-import type { ComponentType } from 'react';
+import { useState, type ComponentType } from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { useClubes } from '../../consultas/clubes';
@@ -83,6 +84,7 @@ export function AppShell() {
   const clubes = useClubes();
   const partidas = usePartidas();
 
+  const [menuAberto, setMenuAberto] = useState(false);
   const secaoAtual = secoesDoCaminho.find((secao) =>
     localizacao.pathname.startsWith(secao.prefixo),
   );
@@ -95,7 +97,21 @@ export function AppShell() {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
-      <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col gap-5 border-r border-sidebar-border bg-sidebar p-3 text-sidebar-foreground">
+      {menuAberto && (
+        <button
+          type="button"
+          aria-label="Fechar menu"
+          className="fixed inset-0 z-30 bg-overlay md:hidden"
+          onClick={() => setMenuAberto(false)}
+        />
+      )}
+      <aside
+        onClick={() => setMenuAberto(false)}
+        className={cn(
+          'fixed inset-y-0 left-0 z-40 w-64 max-w-[85vw] shrink-0 flex-col gap-5 overflow-y-auto border-r border-sidebar-border bg-sidebar p-3 text-sidebar-foreground md:sticky md:top-0 md:z-auto md:flex md:h-screen',
+          menuAberto ? 'flex' : 'hidden',
+        )}
+      >
         <div className="flex items-center gap-3 px-2 pt-1">
           <span className="flex size-8 items-center justify-center rounded-lg bg-primary font-semibold text-primary-foreground">
             P
@@ -195,10 +211,20 @@ export function AppShell() {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-background px-6 py-3">
+        <header className="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-border bg-background px-4 py-3 md:px-6">
+          <Button
+            variante="ghost"
+            tamanho="icone"
+            aria-label="Abrir menu"
+            aria-expanded={menuAberto}
+            className="md:hidden"
+            onClick={() => setMenuAberto(true)}
+          >
+            <Menu />
+          </Button>
           <nav
             aria-label="Caminho"
-            className="flex items-center gap-2 text-sm text-muted-foreground"
+            className="flex min-w-0 items-center gap-2 truncate text-sm text-muted-foreground"
           >
             {secaoAtual && (
               <>
@@ -218,8 +244,8 @@ export function AppShell() {
           </Button>
         </header>
 
-        <main className="flex-1 p-6">
-          <div className="mx-auto flex max-w-6xl flex-col gap-6">
+        <main className="flex-1 p-4 md:p-6">
+          <div className="mx-auto flex min-w-0 max-w-6xl flex-col gap-6">
             <Outlet />
           </div>
         </main>

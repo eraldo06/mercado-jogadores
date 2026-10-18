@@ -136,8 +136,8 @@ export function PaginaClassificacao() {
         }
       />
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_20rem] lg:items-start">
-        <section className="flex flex-col rounded-xl border border-border bg-card">
+      <div className="grid min-w-0 gap-6 lg:grid-cols-[1fr_20rem] lg:items-start">
+        <section className="flex min-w-0 flex-col rounded-xl border border-border bg-card">
           {classificacao.isPending ? (
             <Skeleton className="h-96 w-full" />
           ) : classificacao.isError ? (
@@ -187,7 +187,7 @@ export function PaginaClassificacao() {
           )}
         </section>
 
-        <aside className="flex flex-col gap-6">
+        <aside className="flex min-w-0 flex-col gap-6">
           <section className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
             <div className="flex flex-col gap-0.5">
               <h2 className="text-base font-semibold">Últimas partidas</h2>
