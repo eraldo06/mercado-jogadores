@@ -26,12 +26,18 @@ import {
 } from './validacao-compra';
 
 const ID_FORMULARIO = 'formulario-compra';
-// Valores iniciais da tela de referência (fotos 44 a 51); a banca troca à vontade.
-const VALORES_INICIAIS: ValoresCompra = {
-  clube: '',
-  data: '2027-11-12',
-  hora: '15:00',
-};
+// O enunciado não define prazo padrão de fidelidade (só o limite de 1.095 dias),
+// então o padrão é um ano a partir de hoje.
+function valoresIniciais(): ValoresCompra {
+  const umAnoDepois = new Date();
+  umAnoDepois.setFullYear(umAnoDepois.getFullYear() + 1);
+  const data = [
+    umAnoDepois.getFullYear(),
+    String(umAnoDepois.getMonth() + 1).padStart(2, '0'),
+    String(umAnoDepois.getDate()).padStart(2, '0'),
+  ].join('-');
+  return { clube: '', data, hora: '15:00' };
+}
 
 type PropsDialogComprar = {
   jogador: Jogador;
@@ -44,7 +50,7 @@ type PropsDialogComprar = {
 
 export function DialogComprar(props: PropsDialogComprar) {
   const { jogador, clubes, carregando } = props;
-  const [valores, setValores] = useState<ValoresCompra>(VALORES_INICIAIS);
+  const [valores, setValores] = useState<ValoresCompra>(valoresIniciais);
   const [erros, setErros] = useState<ErrosCompra>({});
   const [tentouEnviar, setTentouEnviar] = useState(false);
 
