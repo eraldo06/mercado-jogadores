@@ -5,7 +5,7 @@ import {
   useQueryClient,
 } from '@tanstack/react-query';
 import { clubesApi, type NovoClube, type OrdemClubes } from '../api/clubes';
-import { mercadoApi } from '../api/mercado';
+import { mercadoApi, type FiltrosHistorico } from '../api/mercado';
 
 export function useClubes() {
   return useQuery({
@@ -47,6 +47,15 @@ export function useVenderJogador() {
       void cliente.invalidateQueries({ queryKey: ['clubes'] });
       void cliente.invalidateQueries({ queryKey: ['jogadores'] });
       void cliente.invalidateQueries({ queryKey: ['escalacao'] });
+      void cliente.invalidateQueries({ queryKey: ['transacoes'] });
     },
+  });
+}
+
+export function useHistorico(clubeId: number, filtros: FiltrosHistorico) {
+  return useQuery({
+    queryKey: ['transacoes', clubeId, filtros],
+    queryFn: () => mercadoApi.historico(clubeId, filtros),
+    placeholderData: keepPreviousData,
   });
 }

@@ -1,4 +1,5 @@
-import { CircleCheck } from 'lucide-react';
+import { CircleCheck, History } from 'lucide-react';
+import { useNavigate } from 'react-router';
 import type { VendaResposta } from '../../api/mercado';
 import { Button } from '../../components/ui/button';
 import { Dialog } from '../../components/ui/dialog';
@@ -34,6 +35,7 @@ export function ResultadoVendaDialog({
   const resposta = resultado?.resposta;
   const comMulta = (resposta?.penalty ?? 0) > 0;
   const lucro = resposta?.profit ?? 0;
+  const navegar = useNavigate();
 
   return (
     <Dialog
@@ -47,7 +49,23 @@ export function ResultadoVendaDialog({
       aoAlterarAbertura={(aberto) => !aberto && aoFechar()}
       titulo="Venda concluída"
       descricao={resultado ? descricaoDoResultado(resultado) : undefined}
-      rodape={resposta && <Button onClick={aoFechar}>Fechar</Button>}
+      rodape={
+        resposta && (
+          <>
+            <Button
+              variante="outline"
+              onClick={() => {
+                aoFechar();
+                navegar(`/clubes/${resposta.club_id}?aba=historico`);
+              }}
+            >
+              <History aria-hidden="true" />
+              Ver histórico
+            </Button>
+            <Button onClick={aoFechar}>Fechar</Button>
+          </>
+        )
+      }
     >
       {resposta && (
         <dl className="divide-y divide-border rounded-lg border border-border text-sm">

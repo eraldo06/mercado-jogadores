@@ -36,6 +36,7 @@ function invalidarMercado(cliente: QueryClient) {
   void cliente.invalidateQueries({ queryKey: ['jogadores'] });
   void cliente.invalidateQueries({ queryKey: ['clubes'] });
   void cliente.invalidateQueries({ queryKey: ['escalacao'] });
+  void cliente.invalidateQueries({ queryKey: ['transacoes'] });
 }
 
 export function useCriarJogador() {

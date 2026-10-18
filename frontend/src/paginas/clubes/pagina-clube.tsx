@@ -1,5 +1,6 @@
 import {
   CircleDollarSign,
+  History,
   Handshake,
   Landmark,
   ShoppingCart,
@@ -8,7 +9,7 @@ import {
   ChevronLeft,
 } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
-import { Link, useParams } from 'react-router';
+import { Link, useParams, useSearchParams } from 'react-router';
 import { ErroApi } from '../../api/cliente';
 import type { JogadorDoClube } from '../../api/clubes';
 import { AvatarIniciais } from '../../components/compartilhados/avatar-iniciais';
@@ -23,10 +24,15 @@ import {
 import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
 import { Skeleton } from '../../components/ui/skeleton';
-import { useClube, useVenderJogador } from '../../consultas/clubes';
+import {
+  useClube,
+  useHistorico,
+  useVenderJogador,
+} from '../../consultas/clubes';
 import { useEscalacao } from '../../consultas/liga';
 import { dataHoraBrasilia, inteiro, moeda } from '../../lib/formatar';
 import { ROTULO_POSICAO } from '../jogadores/filtros';
+import { HistoricoClube } from './historico-clube';
 import { DialogVender } from './dialog-vender';
 import {
   ResultadoVendaDialog,
@@ -183,12 +189,54 @@ function Indicador({
   );
 }
 
+type PropsAbaClube = {
+  ativa: boolean;
+  rotulo: string;
+  icone: typeof Shirt;
+  contagem: number | undefined;
+  aoClicar: () => void;
+};
+
+function AbaClube({
+  ativa,
+  rotulo,
+  icone: Icone,
+  contagem,
+  aoClicar,
+}: PropsAbaClube) {
+  return (
+    <button
+      type="button"
+      role="tab"
+      aria-selected={ativa}
+      onClick={aoClicar}
+      className={`-mb-px flex items-center gap-2 border-b-2 pb-3 text-sm font-medium transition-colors ${
+        ativa
+          ? 'border-primary text-foreground'
+          : 'border-transparent text-muted-foreground hover:text-foreground'
+      }`}
+    >
+      <Icone className="size-4" aria-hidden="true" />
+      {rotulo}
+      {contagem !== undefined && (
+        <span className="rounded-full bg-muted px-2 text-xs tabular-nums">
+          {contagem}
+        </span>
+      )}
+    </button>
+  );
+}
+
 export function PaginaClube() {
   const { id } = useParams();
   const clubeId = Number(id);
   const consulta = useClube(clubeId);
   const escalacao = useEscalacao(clubeId);
   const vender = useVenderJogador();
+  const [parametros, definirParametros] = useSearchParams();
+  const abaAtiva =
+    parametros.get('aba') === 'historico' ? 'historico' : 'elenco';
+  const historicoTodas = useHistorico(clubeId, {});
   const [vendaDe, setVendaDe] = useState<JogadorDoClube | null>(null);
   const [resultadoVenda, setResultadoVenda] = useState<ResultadoVenda | null>(
     null,
@@ -301,35 +349,62 @@ export function PaginaClube() {
         />
       </div>
 
-      <section className="flex flex-col gap-3">
-        <div className="flex flex-col gap-0.5">
-          <h2 className="text-base font-semibold">Elenco</h2>
-          <p className="text-sm text-muted-foreground">
-            Ordem por posição (GOL, ZAG, LAT, MEI, ATA), depois pelo nome.
-            Contrato calculado para uma venda agora.
-          </p>
-        </div>
-        <TabelaDados
-          colunas={criarColunasElenco((jogador) => {
-            vender.reset();
-            setVendaDe(jogador);
-          })}
-          linhas={jogadores}
-          chaveLinha={(jogador) => jogador.id}
-          estado="pronto"
-          vazio={{
-            icone: Shirt,
-            titulo: 'O clube ainda não tem jogadores',
-            descricao:
-              'Compre jogadores livres para formar o elenco. O limite é de 12 jogadores, e o custo de cada compra não pode passar de 50% do caixa.',
-          }}
+      <div
+        role="tablist"
+        aria-label="Seções do clube"
+        className="flex gap-6 border-b border-border"
+      >
+        <AbaClube
+          ativa={abaAtiva === 'elenco'}
+          rotulo="Elenco"
+          icone={Shirt}
+          contagem={jogadores.length}
+          aoClicar={() => definirParametros({})}
         />
-      </section>
+        <AbaClube
+          ativa={abaAtiva === 'historico'}
+          rotulo="Histórico"
+          icone={History}
+          contagem={historicoTodas.data?.data.length}
+          aoClicar={() => definirParametros({ aba: 'historico' })}
+        />
+      </div>
 
-      <p className="text-xs text-muted-foreground">
-        Valor de mercado, dias restantes e % de multa calculados para uma venda
-        agora. A multa tem teto de 10,00.
-      </p>
+      {abaAtiva === 'elenco' && (
+        <>
+          <section className="flex flex-col gap-3">
+            <div className="flex flex-col gap-0.5">
+              <h2 className="text-base font-semibold">Elenco</h2>
+              <p className="text-sm text-muted-foreground">
+                Ordem por posição (GOL, ZAG, LAT, MEI, ATA), depois pelo nome.
+                Contrato calculado para uma venda agora.
+              </p>
+            </div>
+            <TabelaDados
+              colunas={criarColunasElenco((jogador) => {
+                vender.reset();
+                setVendaDe(jogador);
+              })}
+              linhas={jogadores}
+              chaveLinha={(jogador) => jogador.id}
+              estado="pronto"
+              vazio={{
+                icone: Shirt,
+                titulo: 'O clube ainda não tem jogadores',
+                descricao:
+                  'Compre jogadores livres para formar o elenco. O limite é de 12 jogadores, e o custo de cada compra não pode passar de 50% do caixa.',
+              }}
+            />
+          </section>
+
+          <p className="text-xs text-muted-foreground">
+            Valor de mercado, dias restantes e % de multa calculados para uma
+            venda agora. A multa tem teto de 10,00.
+          </p>
+        </>
+      )}
+
+      {abaAtiva === 'historico' && <HistoricoClube clubeId={clubeId} />}
 
       {vendaDe && (
         <DialogVender
