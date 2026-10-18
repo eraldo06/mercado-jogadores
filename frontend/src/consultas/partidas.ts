@@ -1,3 +1,4 @@
+import { useEnvioUnico } from '../lib/envio-unico';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ligaApi, type NovaPartida } from '../api/liga';
 
@@ -17,14 +18,16 @@ export function usePartida(id: number) {
 
 export function useCriarPartida() {
   const cliente = useQueryClient();
-  return useMutation({
-    mutationFn: (dados: NovaPartida) => ligaApi.criarPartida(dados),
-    onSuccess: () => {
-      void cliente.invalidateQueries({ queryKey: ['partidas'] });
-      void cliente.invalidateQueries({ queryKey: ['clubes'] });
-      void cliente.invalidateQueries({ queryKey: ['classificacao'] });
-    },
-  });
+  return useEnvioUnico(
+    useMutation({
+      mutationFn: (dados: NovaPartida) => ligaApi.criarPartida(dados),
+      onSuccess: () => {
+        void cliente.invalidateQueries({ queryKey: ['partidas'] });
+        void cliente.invalidateQueries({ queryKey: ['clubes'] });
+        void cliente.invalidateQueries({ queryKey: ['classificacao'] });
+      },
+    }),
+  );
 }
 
 export function useClassificacao() {

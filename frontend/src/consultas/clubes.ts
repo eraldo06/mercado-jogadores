@@ -1,3 +1,4 @@
+import { useEnvioUnico } from '../lib/envio-unico';
 import {
   keepPreviousData,
   useMutation,
@@ -31,25 +32,29 @@ export function useClube(id: number) {
 
 export function useCriarClube() {
   const cliente = useQueryClient();
-  return useMutation({
-    mutationFn: (dados: NovoClube) => clubesApi.criar(dados),
-    onSuccess: () => {
-      void cliente.invalidateQueries({ queryKey: ['clubes'] });
-    },
-  });
+  return useEnvioUnico(
+    useMutation({
+      mutationFn: (dados: NovoClube) => clubesApi.criar(dados),
+      onSuccess: () => {
+        void cliente.invalidateQueries({ queryKey: ['clubes'] });
+      },
+    }),
+  );
 }
 
 export function useVenderJogador() {
   const cliente = useQueryClient();
-  return useMutation({
-    mutationFn: (jogadorId: number) => mercadoApi.vender(jogadorId),
-    onSuccess: () => {
-      void cliente.invalidateQueries({ queryKey: ['clubes'] });
-      void cliente.invalidateQueries({ queryKey: ['jogadores'] });
-      void cliente.invalidateQueries({ queryKey: ['escalacao'] });
-      void cliente.invalidateQueries({ queryKey: ['transacoes'] });
-    },
-  });
+  return useEnvioUnico(
+    useMutation({
+      mutationFn: (jogadorId: number) => mercadoApi.vender(jogadorId),
+      onSuccess: () => {
+        void cliente.invalidateQueries({ queryKey: ['clubes'] });
+        void cliente.invalidateQueries({ queryKey: ['jogadores'] });
+        void cliente.invalidateQueries({ queryKey: ['escalacao'] });
+        void cliente.invalidateQueries({ queryKey: ['transacoes'] });
+      },
+    }),
+  );
 }
 
 export function useHistorico(clubeId: number, filtros: FiltrosHistorico) {

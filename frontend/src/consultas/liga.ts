@@ -1,3 +1,4 @@
+import { useEnvioUnico } from '../lib/envio-unico';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ligaApi, type NovaEscalacao } from '../api/liga';
 
@@ -15,10 +16,12 @@ export function useSalvarEscalacao(clubeId: number) {
     void cliente.invalidateQueries({ queryKey: ['escalacao', clubeId] });
     void cliente.invalidateQueries({ queryKey: ['clubes'] });
   };
-  return useMutation({
-    mutationFn: (dados: NovaEscalacao) =>
-      ligaApi.salvarEscalacao(clubeId, dados),
-    onSuccess: atualizar,
-    onError: atualizar,
-  });
+  return useEnvioUnico(
+    useMutation({
+      mutationFn: (dados: NovaEscalacao) =>
+        ligaApi.salvarEscalacao(clubeId, dados),
+      onSuccess: atualizar,
+      onError: atualizar,
+    }),
+  );
 }

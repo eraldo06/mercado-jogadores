@@ -1,3 +1,4 @@
+import { useEnvioUnico } from '../lib/envio-unico';
 import {
   keepPreviousData,
   useMutation,
@@ -41,43 +42,53 @@ function invalidarMercado(cliente: QueryClient) {
 
 export function useCriarJogador() {
   const cliente = useQueryClient();
-  return useMutation({
-    mutationFn: (dados: NovoJogador) => jogadoresApi.criar(dados),
-    onSuccess: () => invalidarMercado(cliente),
-  });
+  return useEnvioUnico(
+    useMutation({
+      mutationFn: (dados: NovoJogador) => jogadoresApi.criar(dados),
+      onSuccess: () => invalidarMercado(cliente),
+    }),
+  );
 }
 
 export function useEditarJogador() {
   const cliente = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, dados }: { id: number; dados: EdicaoJogador }) =>
-      jogadoresApi.editar(id, dados),
-    onSuccess: () => invalidarMercado(cliente),
-  });
+  return useEnvioUnico(
+    useMutation({
+      mutationFn: ({ id, dados }: { id: number; dados: EdicaoJogador }) =>
+        jogadoresApi.editar(id, dados),
+      onSuccess: () => invalidarMercado(cliente),
+    }),
+  );
 }
 
 export function useAlterarCondicao() {
   const cliente = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, condicao }: { id: number; condicao: Condicao }) =>
-      jogadoresApi.alterarCondicao(id, condicao),
-    onSuccess: () => invalidarMercado(cliente),
-  });
+  return useEnvioUnico(
+    useMutation({
+      mutationFn: ({ id, condicao }: { id: number; condicao: Condicao }) =>
+        jogadoresApi.alterarCondicao(id, condicao),
+      onSuccess: () => invalidarMercado(cliente),
+    }),
+  );
 }
 
 export function useComprarJogador() {
   const cliente = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, dados }: { id: number; dados: NovaCompra }) =>
-      mercadoApi.comprar(id, dados),
-    onSuccess: () => invalidarMercado(cliente),
-  });
+  return useEnvioUnico(
+    useMutation({
+      mutationFn: ({ id, dados }: { id: number; dados: NovaCompra }) =>
+        mercadoApi.comprar(id, dados),
+      onSuccess: () => invalidarMercado(cliente),
+    }),
+  );
 }
 
 export function useExcluirJogador() {
   const cliente = useQueryClient();
-  return useMutation({
-    mutationFn: (id: number) => jogadoresApi.excluir(id),
-    onSuccess: () => invalidarMercado(cliente),
-  });
+  return useEnvioUnico(
+    useMutation({
+      mutationFn: (id: number) => jogadoresApi.excluir(id),
+      onSuccess: () => invalidarMercado(cliente),
+    }),
+  );
 }

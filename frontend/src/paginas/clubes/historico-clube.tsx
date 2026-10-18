@@ -171,6 +171,7 @@ type PropsHistorico = {
 export function HistoricoClube({ clubeId }: PropsHistorico) {
   const [tipos, setTipos] = useState<TipoTransacao[]>(TIPOS);
   const [jogadorId, setJogadorId] = useState<string>(TODOS);
+  const [exportando, setExportando] = useState(false);
 
   const filtros: FiltrosHistorico = {
     type: tipos.length === TIPOS.length ? undefined : tipos,
@@ -209,6 +210,8 @@ export function HistoricoClube({ clubeId }: PropsHistorico) {
   };
 
   const exportar = async () => {
+    if (exportando) return;
+    setExportando(true);
     try {
       const csv = await mercadoApi.exportarCsv(clubeId, filtros);
       const url = URL.createObjectURL(
@@ -232,6 +235,8 @@ export function HistoricoClube({ clubeId }: PropsHistorico) {
             ? erro.message
             : 'Verifique a conexão e tente de novo.',
       });
+    } finally {
+      setExportando(false);
     }
   };
 
@@ -252,9 +257,14 @@ export function HistoricoClube({ clubeId }: PropsHistorico) {
             momento de cada operação.
           </p>
         </div>
-        <Button variante="outline" onClick={() => void exportar()}>
-          <Download aria-hidden="true" />
-          Exportar CSV
+        <Button
+          variante="outline"
+          onClick={() => void exportar()}
+          disabled={exportando}
+          carregando={exportando}
+        >
+          {!exportando && <Download aria-hidden="true" />}
+          {exportando ? 'Exportando…' : 'Exportar CSV'}
         </Button>
       </div>
 
