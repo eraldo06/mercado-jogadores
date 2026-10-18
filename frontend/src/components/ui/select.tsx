@@ -40,7 +40,9 @@ export function Select({
           className,
         )}
       >
-        <SelectPrimitivo.Value>{textoTrigger}</SelectPrimitivo.Value>
+        <SelectPrimitivo.Value placeholder={textoTrigger}>
+          {textoTrigger}
+        </SelectPrimitivo.Value>
         <SelectPrimitivo.Icon asChild>
           <ChevronDown
             className="size-4 text-muted-foreground"

@@ -1,5 +1,6 @@
 import {
   CircleDollarSign,
+  ClipboardList,
   History,
   Handshake,
   Landmark,
@@ -32,6 +33,7 @@ import {
 import { useEscalacao } from '../../consultas/liga';
 import { dataHoraBrasilia, inteiro, moeda } from '../../lib/formatar';
 import { ROTULO_POSICAO } from '../jogadores/filtros';
+import { EscalacaoClube } from './escalacao-clube';
 import { HistoricoClube } from './historico-clube';
 import { DialogVender } from './dialog-vender';
 import {
@@ -234,8 +236,11 @@ export function PaginaClube() {
   const escalacao = useEscalacao(clubeId);
   const vender = useVenderJogador();
   const [parametros, definirParametros] = useSearchParams();
+  const abaParametro = parametros.get('aba');
   const abaAtiva =
-    parametros.get('aba') === 'historico' ? 'historico' : 'elenco';
+    abaParametro === 'historico' || abaParametro === 'escalacao'
+      ? abaParametro
+      : 'elenco';
   const historicoTodas = useHistorico(clubeId, {});
   const [vendaDe, setVendaDe] = useState<JogadorDoClube | null>(null);
   const [resultadoVenda, setResultadoVenda] = useState<ResultadoVenda | null>(
@@ -362,6 +367,13 @@ export function PaginaClube() {
           aoClicar={() => definirParametros({})}
         />
         <AbaClube
+          ativa={abaAtiva === 'escalacao'}
+          rotulo="Escalação"
+          icone={ClipboardList}
+          contagem={undefined}
+          aoClicar={() => definirParametros({ aba: 'escalacao' })}
+        />
+        <AbaClube
           ativa={abaAtiva === 'historico'}
           rotulo="Histórico"
           icone={History}
@@ -403,6 +415,18 @@ export function PaginaClube() {
           </p>
         </>
       )}
+
+      {abaAtiva === 'escalacao' &&
+        (escalacao.data ? (
+          <EscalacaoClube
+            clubeId={clubeId}
+            nomeDoClube={clube.name}
+            escalacao={escalacao.data}
+            jogadores={jogadores}
+          />
+        ) : (
+          <Skeleton className="h-96 w-full" />
+        ))}
 
       {abaAtiva === 'historico' && <HistoricoClube clubeId={clubeId} />}
 
