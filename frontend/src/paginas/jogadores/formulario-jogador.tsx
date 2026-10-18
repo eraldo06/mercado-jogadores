@@ -148,7 +148,7 @@ export function FormularioJogador(props: PropsFormularioJogador) {
           ? 'Preencha os dados e os indicadores técnicos. O valor base, o overall e o valor de mercado são calculados ao salvar.'
           : 'Edite nome, posição, idade e agilidade. Os demais dados não mudam.'
       }
-      largura={criando ? 'xl' : 'md'}
+      largura={criando ? '3xl' : 'md'}
       rodape={
         <>
           {criando && (

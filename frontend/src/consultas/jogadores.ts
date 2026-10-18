@@ -5,6 +5,7 @@ import {
   useQueryClient,
   type QueryClient,
 } from '@tanstack/react-query';
+import { mercadoApi, type NovaCompra } from '../api/mercado';
 import {
   jogadoresApi,
   type EdicaoJogador,
@@ -59,6 +60,15 @@ export function useAlterarCondicao() {
   return useMutation({
     mutationFn: ({ id, condicao }: { id: number; condicao: Condicao }) =>
       jogadoresApi.alterarCondicao(id, condicao),
+    onSuccess: () => invalidarMercado(cliente),
+  });
+}
+
+export function useComprarJogador() {
+  const cliente = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, dados }: { id: number; dados: NovaCompra }) =>
+      mercadoApi.comprar(id, dados),
     onSuccess: () => invalidarMercado(cliente),
   });
 }

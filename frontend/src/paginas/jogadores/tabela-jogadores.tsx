@@ -1,3 +1,4 @@
+import { ShoppingCart } from 'lucide-react';
 import { Link } from 'react-router';
 import type { Jogador } from '../../api/jogadores';
 import type { ColunaTabela } from '../../components/compartilhados/tabela-dados';
@@ -5,6 +6,7 @@ import { AvatarIniciais } from '../../components/compartilhados/avatar-iniciais'
 import { BarraAgilidade } from '../../components/compartilhados/barra-agilidade';
 import { CondicaoBadge } from '../../components/compartilhados/condicao-badge';
 import { Badge } from '../../components/ui/badge';
+import { Button } from '../../components/ui/button';
 import { moeda } from '../../lib/formatar';
 import { ROTULO_POSICAO } from './filtros';
 import { MenuAcoesJogador } from './menu-acoes-jogador';
@@ -17,6 +19,7 @@ export type ClubeNaTabela = {
 type AcoesJogador = {
   aoEditar: (jogador: Jogador) => void;
   aoAlterarCondicao: (jogador: Jogador) => void;
+  aoComprar: (jogador: Jogador) => void;
   aoExcluir: (jogador: Jogador) => void;
 };
 
@@ -118,14 +121,22 @@ export function colunasJogadores(
       chave: 'acoes',
       titulo: '',
       alinhamento: 'direita',
-      className: 'w-12',
       render: (jogador) => (
-        <MenuAcoesJogador
-          jogador={jogador}
-          aoEditar={acoes.aoEditar}
-          aoAlterarCondicao={acoes.aoAlterarCondicao}
-          aoExcluir={acoes.aoExcluir}
-        />
+        <div className="flex items-center justify-end gap-2">
+          {jogador.club_id === null && (
+            <Button variante="outline" onClick={() => acoes.aoComprar(jogador)}>
+              <ShoppingCart aria-hidden="true" />
+              Comprar
+            </Button>
+          )}
+          <MenuAcoesJogador
+            jogador={jogador}
+            aoEditar={acoes.aoEditar}
+            aoAlterarCondicao={acoes.aoAlterarCondicao}
+            aoComprar={acoes.aoComprar}
+            aoExcluir={acoes.aoExcluir}
+          />
+        </div>
       ),
     },
   ];

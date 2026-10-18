@@ -12,20 +12,24 @@ import { useClubes } from '../../consultas/clubes';
 import { useEscalacao } from '../../consultas/liga';
 import {
   useAlterarCondicao,
+  useComprarJogador,
   useContagemJogadores,
   useCriarJogador,
   useEditarJogador,
   useExcluirJogador,
   useListaJogadores,
 } from '../../consultas/jogadores';
+import type { CompraResposta } from '../../api/mercado';
 import { cn } from '../../lib/utils';
 import { BarraFiltros, ChipsFiltros } from './barra-filtros';
 import { Alert } from '../../components/ui/alert';
 import { Badge } from '../../components/ui/badge';
 import { ConfirmacaoDialog } from '../../components/compartilhados/confirmacao-dialog';
+import { DialogComprar } from './dialog-comprar';
 import { DialogCondicao } from './dialog-condicao';
 import { FormularioJogador } from './formulario-jogador';
 import { JogadorCadastradoDialog } from './jogador-cadastrado-dialog';
+import { ResultadoCompraDialog } from './resultado-compra-dialog';
 import { Paginacao } from './paginacao';
 import { colunasJogadores } from './tabela-jogadores';
 import {
@@ -128,9 +132,15 @@ export function PaginaJogadores() {
   const [formulario, setFormulario] = useState<FormularioAberto>(null);
   const [condicaoDe, setCondicaoDe] = useState<Jogador | null>(null);
   const [cadastrado, setCadastrado] = useState<Jogador | null>(null);
+  const [compraDe, setCompraDe] = useState<Jogador | null>(null);
+  const [compraFeita, setCompraFeita] = useState<{
+    resposta: CompraResposta;
+    nomeDoClube: string;
+  } | null>(null);
   const criar = useCriarJogador();
   const editar = useEditarJogador();
   const alterarCondicao = useAlterarCondicao();
+  const comprar = useComprarJogador();
   const excluir = useExcluirJogador();
   const [excluirDe, setExcluirDe] = useState<Jogador | null>(null);
   const escalacaoDoClube = useEscalacao(
@@ -157,6 +167,10 @@ export function PaginaJogadores() {
   const abrirCondicao = (jogador: Jogador) => {
     alterarCondicao.reset();
     setCondicaoDe(jogador);
+  };
+  const abrirComprar = (jogador: Jogador) => {
+    comprar.reset();
+    setCompraDe(jogador);
   };
 
   const opcoesOrdem: OpcaoSelect[] = ORDENS.map((ordem) => ({
@@ -256,6 +270,7 @@ export function PaginaJogadores() {
           colunas={colunasJogadores(clubesPorId, {
             aoEditar: abrirEditar,
             aoAlterarCondicao: abrirCondicao,
+            aoComprar: abrirComprar,
             aoExcluir: abrirExcluir,
           })}
           linhas={lista.data?.data ?? []}
@@ -292,11 +307,6 @@ export function PaginaJogadores() {
           }
         />
       </div>
-
-      <p className="text-xs text-muted-foreground">
-        Overall e valor de mercado são calculados a cada consulta. A busca
-        ignora maiúsculas, minúsculas e acentos.
-      </p>
 
       {formulario?.modo === 'criar' && (
         <FormularioJogador
@@ -371,6 +381,38 @@ export function PaginaJogadores() {
           }
         />
       )}
+
+      {compraDe && (
+        <DialogComprar
+          key={compraDe.id}
+          jogador={compraDe}
+          clubes={listaClubes}
+          aoFechar={() => setCompraDe(null)}
+          carregando={comprar.isPending}
+          erroApi={comprar.error}
+          aoSalvar={(dados) =>
+            comprar.mutate(
+              { id: compraDe.id, dados },
+              {
+                onSuccess: (resposta) => {
+                  setCompraDe(null);
+                  setCompraFeita({
+                    resposta,
+                    nomeDoClube:
+                      clubesPorId.get(dados.club_id)?.name ?? 'clube',
+                  });
+                },
+              },
+            )
+          }
+        />
+      )}
+
+      <ResultadoCompraDialog
+        resposta={compraFeita?.resposta ?? null}
+        nomeDoClube={compraFeita?.nomeDoClube ?? ''}
+        aoFechar={() => setCompraFeita(null)}
+      />
 
       {excluirDe && (
         <ConfirmacaoDialog

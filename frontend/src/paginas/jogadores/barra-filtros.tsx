@@ -191,12 +191,6 @@ export function BarraFiltros({
           Digite pelo menos 2 caracteres para buscar.
         </p>
       )}
-      {clubeDesabilitado && (
-        <p className="text-xs text-muted-foreground">
-          Com a aba “Livres”, o filtro por clube fica desabilitado, porque essa
-          combinação não é aceita.
-        </p>
-      )}
     </div>
   );
 }

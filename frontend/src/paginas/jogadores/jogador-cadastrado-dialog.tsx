@@ -18,6 +18,11 @@ export function JogadorCadastradoDialog({
     <Dialog
       aberto={jogador !== null}
       aoAlterarAbertura={(aberto) => !aberto && aoFechar()}
+      icone={
+        <span className="flex size-9 items-center justify-center rounded-full bg-success-soft text-success">
+          <CircleCheck className="size-5" aria-hidden="true" />
+        </span>
+      }
       titulo="Jogador cadastrado"
       descricao={
         jogador
@@ -26,9 +31,6 @@ export function JogadorCadastradoDialog({
       }
       rodape={<Button onClick={aoFechar}>Fechar</Button>}
     >
-      <span className="flex size-9 items-center justify-center rounded-full bg-success-soft text-success">
-        <CircleCheck className="size-5" aria-hidden="true" />
-      </span>
       {jogador && (
         <dl className="divide-y divide-border rounded-lg border border-border text-sm">
           <div className="flex items-center justify-between gap-4 p-3">

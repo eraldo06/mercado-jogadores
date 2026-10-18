@@ -95,7 +95,7 @@ export function AppShell() {
 
   return (
     <div className="flex min-h-screen bg-background text-foreground">
-      <aside className="sticky top-0 flex h-screen w-60 shrink-0 flex-col gap-5 border-r border-sidebar-border bg-sidebar p-3 text-sidebar-foreground">
+      <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col gap-5 border-r border-sidebar-border bg-sidebar p-3 text-sidebar-foreground">
         <div className="flex items-center gap-3 px-2 pt-1">
           <span className="flex size-8 items-center justify-center rounded-lg bg-primary font-semibold text-primary-foreground">
             P
