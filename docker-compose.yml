@@ -16,5 +16,29 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
 
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PORT: 3000
+      CORS_ORIGIN: http://localhost:5173
+      DATABASE_URL: postgresql://mercado:mercado@db:5432/mercado?schema=public
+    ports:
+      - "3000:3000"
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: http://localhost:3000
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
 volumes:
   db-data:

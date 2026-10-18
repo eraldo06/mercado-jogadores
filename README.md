@@ -73,6 +73,24 @@ npm run dev
 
 A interface abre em **http://localhost:5173** (a tela inicial é a de jogadores). Para gerar o build de produção: `npm run build` e, para servir o build, `npm run preview` (porta 4173). Detalhes, bibliotecas e decisões do frontend estão em [frontend/README.md](frontend/README.md).
 
+### Docker (banco, API e interface com um comando)
+
+Pré-requisito: Docker Engine com Docker Compose v2 (`docker compose`), usável sem `sudo`. Na raiz do repositório:
+
+```bash
+docker compose up -d --build
+```
+
+O comando constrói as imagens da API e da interface a partir deste repositório, sobe o banco PostgreSQL 16, aplica as migrations ao iniciar a API e sobe a interface. Depois:
+
+- Interface: **http://localhost:5173**
+- API: origem `http://localhost:3000` (rotas em `/api/v1`, Swagger em `http://localhost:3000/api/docs`)
+- Banco: `localhost:5432` (usuário, senha e banco `mercado`)
+
+Para desligar sem apagar os dados: `docker compose down`. Para recriar o banco do zero (apaga os dados do volume `db-data`): `docker compose down -v` e depois `docker compose up -d --build`. Para acompanhar os logs: `docker compose logs -f`.
+
+As imagens usadas são públicas (`node:22-slim`, `postgres:16-alpine` e `nginx:alpine`). A URL da API que a interface usa é gravada no build (`VITE_API_URL=http://localhost:3000` no `docker-compose.yml`). Se você mudar as portas, ajuste essa variável e `CORS_ORIGIN`, e rode `docker compose up -d --build` de novo.
+
 ### Testes e qualidade (frontend)
 
 Na pasta `frontend`:
@@ -176,7 +194,6 @@ Bibliotecas do backend:
 
 - Frontend: o menu "Ver detalhes" do jogador (painel lateral da foto 23 do mockup) e a prévia do campo na tela da partida (foto 64) não foram implementados.
 - Fidelidade visual ao Figma: as telas foram conferidas contra as capturas de referência da pasta `fotos/` (desktop). Não houve comparação direta com o arquivo do Figma, que não estava acessível. A versão em 375 px foi verificada pela largura da página, não contra o frame mobile do Figma.
-- Docker da API e do frontend: o `docker-compose.yml` atual sobe só o banco.
 
 Todos os endpoints da seção 2 do enunciado estão implementados no backend.
 
