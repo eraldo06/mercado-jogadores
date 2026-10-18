@@ -10,6 +10,7 @@ import { Dialog } from '../../components/ui/dialog';
 import { cn } from '../../lib/utils';
 import { CondicaoBadge } from '../../components/compartilhados/condicao-badge';
 import { ROTULO_CONDICAO } from './filtros';
+import { validarCondicao } from './validacao-condicao';
 
 const OPCOES: { valor: Condicao; descricao: string }[] = [
   { valor: 'APTO', descricao: 'Sem desconto por condição.' },
@@ -38,6 +39,7 @@ type PropsDialogCondicao = {
 export function DialogCondicao(props: PropsDialogCondicao) {
   const { jogador } = props;
   const [selecionada, setSelecionada] = useState<Condicao>(jogador.condition);
+  const [erroDaValidacao, setErroDaValidacao] = useState<string | undefined>();
   const mudaParaDoente =
     props.titular && selecionada === 'DOENTE' && jogador.condition !== 'DOENTE';
   const erroDaApi =
@@ -64,7 +66,14 @@ export function DialogCondicao(props: PropsDialogCondicao) {
           </Button>
           <Button
             carregando={props.carregando}
-            onClick={() => props.aoSalvar(selecionada)}
+            onClick={() => {
+              const { condicao, erro } = validarCondicao(
+                jogador.condition,
+                selecionada,
+              );
+              setErroDaValidacao(erro);
+              if (condicao) props.aoSalvar(condicao);
+            }}
           >
             Salvar condição
           </Button>
@@ -143,6 +152,12 @@ export function DialogCondicao(props: PropsDialogCondicao) {
             </span>
           </div>
         </div>
+      )}
+
+      {erroDaValidacao && (
+        <p className="text-xs text-destructive-soft-foreground">
+          {erroDaValidacao}
+        </p>
       )}
 
       {erroDaApi && (

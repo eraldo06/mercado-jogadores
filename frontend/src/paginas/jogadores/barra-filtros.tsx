@@ -18,6 +18,11 @@ import {
   PopoverGatilho,
 } from '../../components/ui/popover';
 import { textoFaixa, textoFaixaValor } from './filtros';
+import { validarFaixaIdade, type ErrosFaixaIdade } from './validacao-idade';
+import {
+  validarFaixaMoeda,
+  type ErrosFaixaMoeda,
+} from '../../lib/validacao-moeda';
 import { Select, type OpcaoSelect } from '../../components/ui/select';
 import {
   ROTULO_CONDICAO,
@@ -83,6 +88,7 @@ export function BarraFiltros({
           <Input
             aria-label="Buscar por nome"
             placeholder="Buscar por nome"
+            maxLength={100}
             className="pl-9"
             value={buscaDigitada}
             onChange={(evento) => aoDigitarBusca(evento.target.value)}
@@ -203,27 +209,21 @@ type PropsFormFaixa = {
 function FormFaixaIdade({ estado, aoAplicar }: PropsFormFaixa) {
   const [minimo, setMinimo] = useState(estado.idadeMin?.toString() ?? '');
   const [maximo, setMaximo] = useState(estado.idadeMax?.toString() ?? '');
-  const min = minimo === '' ? undefined : Number(minimo);
-  const max = maximo === '' ? undefined : Number(maximo);
-  const erro =
-    (min !== undefined && (!Number.isInteger(min) || min < 16 || min > 45)) ||
-    (max !== undefined && (!Number.isInteger(max) || max < 16 || max > 45))
-      ? 'Use uma idade de 16 a 45 anos.'
-      : min !== undefined && max !== undefined && min > max
-        ? 'A idade mínima não pode ser maior que a máxima.'
-        : undefined;
+  const [erros, setErros] = useState<ErrosFaixaIdade>({});
 
   return (
     <form
       className="flex flex-col gap-4"
       onSubmit={(evento) => {
         evento.preventDefault();
-        if (!erro) aoAplicar({ idadeMin: min, idadeMax: max });
+        const { dados, erros: novos } = validarFaixaIdade(minimo, maximo);
+        setErros(novos);
+        if (dados) aoAplicar({ idadeMin: dados.min, idadeMax: dados.max });
       }}
     >
       <p className="text-sm font-medium">Idade</p>
       <div className="grid grid-cols-2 gap-3">
-        <Campo id="idade-minima" rotulo="De" erro={undefined}>
+        <Campo id="idade-minima" rotulo="De" erro={erros.minimo}>
           <Input
             id="idade-minima"
             inputMode="numeric"
@@ -232,7 +232,7 @@ function FormFaixaIdade({ estado, aoAplicar }: PropsFormFaixa) {
             onChange={(e) => setMinimo(e.target.value)}
           />
         </Campo>
-        <Campo id="idade-maxima" rotulo="Até" erro={undefined}>
+        <Campo id="idade-maxima" rotulo="Até" erro={erros.maximo}>
           <Input
             id="idade-maxima"
             inputMode="numeric"
@@ -242,9 +242,6 @@ function FormFaixaIdade({ estado, aoAplicar }: PropsFormFaixa) {
           />
         </Campo>
       </div>
-      {erro && (
-        <p className="text-xs text-destructive-soft-foreground">{erro}</p>
-      )}
       <div className="flex justify-between gap-2">
         <Button
           type="button"
@@ -256,7 +253,7 @@ function FormFaixaIdade({ estado, aoAplicar }: PropsFormFaixa) {
         >
           Limpar
         </Button>
-        <Button type="submit" tamanho="sm" disabled={erro !== undefined}>
+        <Button type="submit" tamanho="sm">
           Aplicar
         </Button>
       </div>
@@ -271,58 +268,45 @@ function FormFaixaValor({ estado, aoAplicar }: PropsFormFaixa) {
   const [maximo, setMaximo] = useState(
     estado.valorMax?.replace('.', ',') ?? '',
   );
-  const numero = (texto: string) =>
-    texto.trim() === '' ? undefined : Number(texto.replace(',', '.'));
-  const min = numero(minimo);
-  const max = numero(maximo);
-  const formatoValido = /^\d{1,3}([.,]\d{1,2})?$/;
-  const erro =
-    (minimo !== '' && !formatoValido.test(minimo.trim())) ||
-    (maximo !== '' && !formatoValido.test(maximo.trim()))
-      ? 'Use um valor como 10 ou 10,50.'
-      : (min !== undefined && (min < 0 || min > 550)) ||
-          (max !== undefined && (max < 0 || max > 550))
-        ? 'Use um valor de 0 a 550.'
-        : min !== undefined && max !== undefined && min > max
-          ? 'O valor mínimo não pode ser maior que o máximo.'
-          : undefined;
+  const [erros, setErros] = useState<ErrosFaixaMoeda>({});
 
   return (
     <form
       className="flex flex-col gap-4"
       onSubmit={(evento) => {
         evento.preventDefault();
-        if (erro) return;
+        const { dados, erros: novos } = validarFaixaMoeda(minimo, maximo);
+        setErros(novos);
+        if (!dados) return;
         aoAplicar({
-          valorMin: min === undefined ? undefined : String(min),
-          valorMax: max === undefined ? undefined : String(max),
+          valorMin: dados.min === undefined ? undefined : String(dados.min),
+          valorMax: dados.max === undefined ? undefined : String(dados.max),
         });
       }}
     >
       <p className="text-sm font-medium">Valor de mercado (moedas)</p>
       <div className="grid grid-cols-2 gap-3">
-        <Campo id="valor-minimo" rotulo="De">
+        <Campo id="valor-minimo" rotulo="De" erro={erros.minimo}>
           <Input
             id="valor-minimo"
             inputMode="decimal"
             placeholder="0,00"
             value={minimo}
+            aria-invalid={erros.minimo ? true : undefined}
             onChange={(e) => setMinimo(e.target.value)}
           />
         </Campo>
-        <Campo id="valor-maximo" rotulo="Até">
+        <Campo id="valor-maximo" rotulo="Até" erro={erros.maximo}>
           <Input
             id="valor-maximo"
             inputMode="decimal"
             placeholder="550,00"
             value={maximo}
+            aria-invalid={erros.maximo ? true : undefined}
             onChange={(e) => setMaximo(e.target.value)}
           />
         </Campo>
       </div>
-      {erro && (
-        <p className="text-xs text-destructive-soft-foreground">{erro}</p>
-      )}
       <div className="flex justify-between gap-2">
         <Button
           type="button"
@@ -334,7 +318,7 @@ function FormFaixaValor({ estado, aoAplicar }: PropsFormFaixa) {
         >
           Limpar
         </Button>
-        <Button type="submit" tamanho="sm" disabled={erro !== undefined}>
+        <Button type="submit" tamanho="sm">
           Aplicar
         </Button>
       </div>

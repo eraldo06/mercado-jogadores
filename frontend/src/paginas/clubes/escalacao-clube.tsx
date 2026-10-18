@@ -18,6 +18,7 @@ import { Badge } from '../../components/ui/badge';
 import { Button } from '../../components/ui/button';
 import { Select } from '../../components/ui/select';
 import { useSalvarEscalacao } from '../../consultas/liga';
+import { escalacaoSchema, escalacaoValida } from './validacao-escalacao';
 import { cn } from '../../lib/utils';
 
 type Grupo = 'GOL' | 'DEF' | 'MEI' | 'ATA';
@@ -210,10 +211,7 @@ function FormularioEscalacao({
   );
 
   const vagas = vagasDa(formacao);
-  const completa =
-    escolhidos.length === 5 &&
-    escolhidos.every((id) => id !== null) &&
-    vagas.length === 5;
+  const completa = escalacaoValida(formacao, escolhidos);
   const erroDaApi =
     salvar.error instanceof ErroApi ? salvar.error.message : undefined;
   const erroDeRede = salvar.error && !(salvar.error instanceof ErroApi);
@@ -248,8 +246,16 @@ function FormularioEscalacao({
   };
 
   const enviar = () => {
+    const resultado = escalacaoSchema.safeParse({
+      formacao,
+      titulares: escolhidos,
+    });
+    if (!resultado.success) return;
     salvar.mutate(
-      { formation: formacao, player_ids: escolhidos as number[] },
+      {
+        formation: resultado.data.formacao,
+        player_ids: resultado.data.titulares,
+      },
       { onSuccess: () => toast.success('Escalação salva') },
     );
   };

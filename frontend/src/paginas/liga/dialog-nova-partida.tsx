@@ -7,6 +7,11 @@ import { Alert } from '../../components/ui/alert';
 import { Button } from '../../components/ui/button';
 import { Dialog } from '../../components/ui/dialog';
 import { Select } from '../../components/ui/select';
+import {
+  validarPartida,
+  type ErrosPartida,
+  type ValoresPartida,
+} from './validacao-partida';
 
 type PropsDialogNovaPartida = {
   clubes: ClubeResumo[];
@@ -25,7 +30,8 @@ export function DialogNovaPartida({
 }: PropsDialogNovaPartida) {
   const [mandante, setMandante] = useState('');
   const [visitante, setVisitante] = useState('');
-  const [erroLocal, setErroLocal] = useState<string | undefined>();
+  const [erros, setErros] = useState<ErrosPartida>({});
+  const [tentou, setTentou] = useState(false);
 
   const erroDaApi = erroApi instanceof ErroApi ? erroApi.message : undefined;
   const erroDeRede = Boolean(erroApi) && !(erroApi instanceof ErroApi);
@@ -37,19 +43,17 @@ export function DialogNovaPartida({
 
   const enviar = (evento: FormEvent) => {
     evento.preventDefault();
-    if (!mandante || !visitante) {
-      setErroLocal('Escolha o mandante e o visitante.');
-      return;
-    }
-    if (mandante === visitante) {
-      setErroLocal('Precisa ser um clube diferente do mandante.');
-      return;
-    }
-    setErroLocal(undefined);
-    aoSalvar({
-      home_club_id: Number(mandante),
-      away_club_id: Number(visitante),
-    });
+    setTentou(true);
+    const { dados, erros: novos } = validarPartida({ mandante, visitante });
+    setErros(novos);
+    if (dados) aoSalvar(dados);
+  };
+
+  const trocar = (campo: keyof ValoresPartida, valor: string) => {
+    const proximos = { mandante, visitante, [campo]: valor };
+    if (campo === 'mandante') setMandante(valor);
+    else setVisitante(valor);
+    if (tentou) setErros(validarPartida(proximos).erros);
   };
 
   return (
@@ -101,7 +105,7 @@ export function DialogNovaPartida({
           <Select
             ariaLabel="Mandante"
             valor={mandante}
-            aoAlterar={setMandante}
+            aoAlterar={(valor) => trocar('mandante', valor)}
             opcoes={opcoes}
             textoTrigger={
               <span className="flex items-center gap-2">
@@ -116,9 +120,15 @@ export function DialogNovaPartida({
             }
             className="w-full justify-between pl-4"
           />
-          <p className="text-xs text-muted-foreground">
-            Faz os 3 primeiros ataques.
-          </p>
+          {erros.mandante ? (
+            <p className="text-xs text-destructive-soft-foreground">
+              {erros.mandante}
+            </p>
+          ) : (
+            <p className="text-xs text-muted-foreground">
+              Faz os 3 primeiros ataques.
+            </p>
+          )}
         </fieldset>
 
         <fieldset className="flex flex-col gap-1.5">
@@ -126,7 +136,7 @@ export function DialogNovaPartida({
           <Select
             ariaLabel="Visitante"
             valor={visitante}
-            aoAlterar={setVisitante}
+            aoAlterar={(valor) => trocar('visitante', valor)}
             opcoes={opcoes}
             textoTrigger={
               <span className="flex items-center gap-2">
@@ -141,9 +151,9 @@ export function DialogNovaPartida({
             }
             className="w-full justify-between pl-4"
           />
-          {erroLocal ? (
+          {erros.visitante ? (
             <p className="text-xs text-destructive-soft-foreground">
-              {erroLocal}
+              {erros.visitante}
             </p>
           ) : (
             <p className="text-xs text-muted-foreground">
