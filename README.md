@@ -58,6 +58,8 @@ npm run start:dev
 
 A API responde em **http://localhost:3000**. Todas as rotas começam com `/api/v1`, e a origem da API para a banca é `http://localhost:3000`. A documentação interativa (Swagger) fica em http://localhost:3000/api/docs.
 
+Cada requisição gera uma linha no terminal onde o backend está rodando, com data e hora, método, caminho e status. Exemplo: `LOG [HTTP] GET /api/v1/players 200`. O registro usa o `Logger` do NestJS.
+
 ### Frontend
 
 > Em construção. Os comandos (`npm ci`, `npm run dev`) e a URL da interface, `http://localhost:5173`, serão preenchidos quando o frontend estiver pronto.
