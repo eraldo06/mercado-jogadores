@@ -1,9 +1,27 @@
-import { useQuery } from '@tanstack/react-query';
-import { ligaApi } from '../api/liga';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { ligaApi, type NovaPartida } from '../api/liga';
 
-export function usePartidas() {
+export function usePartidas(clubeId?: number) {
   return useQuery({
-    queryKey: ['partidas'],
-    queryFn: () => ligaApi.partidas(),
+    queryKey: ['partidas', clubeId ?? 'todas'],
+    queryFn: () => ligaApi.partidas(clubeId),
+  });
+}
+
+export function usePartida(id: number) {
+  return useQuery({
+    queryKey: ['partidas', 'detalhe', id],
+    queryFn: () => ligaApi.partida(id),
+  });
+}
+
+export function useCriarPartida() {
+  const cliente = useQueryClient();
+  return useMutation({
+    mutationFn: (dados: NovaPartida) => ligaApi.criarPartida(dados),
+    onSuccess: () => {
+      void cliente.invalidateQueries({ queryKey: ['partidas'] });
+      void cliente.invalidateQueries({ queryKey: ['clubes'] });
+    },
   });
 }

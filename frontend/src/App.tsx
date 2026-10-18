@@ -3,6 +3,8 @@ import { AppShell } from './components/compartilhados/app-shell';
 import { PaginaJogadores } from './paginas/jogadores/pagina-jogadores';
 import { PaginaClube } from './paginas/clubes/pagina-clube';
 import { PaginaClubes } from './paginas/clubes/pagina-clubes';
+import { PaginaPartida } from './paginas/liga/pagina-partida';
+import { PaginaPartidas } from './paginas/liga/pagina-partidas';
 
 function EmConstrucao({ titulo }: { titulo: string }) {
   return (
@@ -23,7 +25,8 @@ export default function App() {
         <Route path="jogadores" element={<PaginaJogadores />} />
         <Route path="clubes" element={<PaginaClubes />} />
         <Route path="clubes/:id" element={<PaginaClube />} />
-        <Route path="partidas" element={<EmConstrucao titulo="Partidas" />} />
+        <Route path="partidas" element={<PaginaPartidas />} />
+        <Route path="partidas/:id" element={<PaginaPartida />} />
         <Route
           path="classificacao"
           element={<EmConstrucao titulo="Classificação" />}
