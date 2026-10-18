@@ -5,17 +5,7 @@ import { PaginaClube } from './paginas/clubes/pagina-clube';
 import { PaginaClubes } from './paginas/clubes/pagina-clubes';
 import { PaginaPartida } from './paginas/liga/pagina-partida';
 import { PaginaPartidas } from './paginas/liga/pagina-partidas';
-
-function EmConstrucao({ titulo }: { titulo: string }) {
-  return (
-    <div className="flex flex-col gap-2">
-      <h1 className="text-2xl font-semibold tracking-[-0.025em]">{titulo}</h1>
-      <p className="text-sm text-muted-foreground">
-        Esta tela ainda será implementada.
-      </p>
-    </div>
-  );
-}
+import { PaginaClassificacao } from './paginas/liga/pagina-classificacao';
 
 export default function App() {
   return (
@@ -27,10 +17,7 @@ export default function App() {
         <Route path="clubes/:id" element={<PaginaClube />} />
         <Route path="partidas" element={<PaginaPartidas />} />
         <Route path="partidas/:id" element={<PaginaPartida />} />
-        <Route
-          path="classificacao"
-          element={<EmConstrucao titulo="Classificação" />}
-        />
+        <Route path="classificacao" element={<PaginaClassificacao />} />
       </Route>
     </Routes>
   );

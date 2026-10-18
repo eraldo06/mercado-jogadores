@@ -22,6 +22,14 @@ export function useCriarPartida() {
     onSuccess: () => {
       void cliente.invalidateQueries({ queryKey: ['partidas'] });
       void cliente.invalidateQueries({ queryKey: ['clubes'] });
+      void cliente.invalidateQueries({ queryKey: ['classificacao'] });
     },
+  });
+}
+
+export function useClassificacao() {
+  return useQuery({
+    queryKey: ['classificacao'],
+    queryFn: () => ligaApi.classificacao(),
   });
 }
