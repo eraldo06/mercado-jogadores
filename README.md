@@ -1,6 +1,6 @@
 # Mercado de Jogadores
 
-Sistema "Passe": mercado de jogadores de uma liga de futebol fictícia. Clubes compram e vendem jogadores com contrato de fidelidade, escalam titulares e jogam partidas. O backend é uma API REST em NestJS com PostgreSQL. O frontend (React, em construção) consome essa API.
+Sistema "Passe": mercado de jogadores de uma liga de futebol fictícia. Clubes compram e vendem jogadores com contrato de fidelidade, escalam titulares e jogam partidas. O backend é uma API REST em NestJS com PostgreSQL. O frontend (React com TypeScript) consome essa API e está em `frontend/`.
 
 ## Pré-requisitos
 
@@ -62,7 +62,27 @@ Cada requisição gera uma linha no terminal onde o backend está rodando, com d
 
 ### Frontend
 
-> Em construção. Os comandos (`npm ci`, `npm run dev`) e a URL da interface, `http://localhost:5173`, serão preenchidos quando o frontend estiver pronto.
+Com o backend rodando em `http://localhost:3000`, a partir da raiz do repositório:
+
+```bash
+cd frontend
+cp .env.example .env
+npm ci
+npm run dev
+```
+
+A interface abre em **http://localhost:5173** (a tela inicial é a de jogadores). Para gerar o build de produção: `npm run build` e, para servir o build, `npm run preview` (porta 4173). Detalhes, bibliotecas e decisões do frontend estão em [frontend/README.md](frontend/README.md).
+
+### Testes e qualidade (frontend)
+
+Na pasta `frontend`:
+
+```bash
+npm test              # testes com Vitest e Testing Library (termina sozinho)
+npm run lint          # ESLint
+npm run format:check  # Prettier, só verifica
+npm run build         # verificação de tipos e build
+```
 
 ### Testes e qualidade (backend)
 
@@ -96,6 +116,8 @@ Variáveis do backend, em `backend/.env.example`. Copie para `backend/.env` com 
 
 O `.env` não vai para o repositório (está no `.gitignore`). O `docker-compose.yml` não precisa de variáveis: as credenciais do banco de desenvolvimento estão nele.
 
+Variáveis do frontend, em `frontend/.env.example`: `VITE_API_URL=http://localhost:3000` (origem da API). Copie para `frontend/.env` com `cp .env.example .env`. Detalhes em [frontend/README.md](frontend/README.md).
+
 ## Estrutura de pastas e bibliotecas
 
 ```text
@@ -116,7 +138,7 @@ mercado-jogadores/
 │   │   ├── app.setup.ts      configuração comum (prefixo, CORS, validação, erros)
 │   │   └── main.ts           inicialização e Swagger
 │   └── test/                 testes de ponta a ponta
-└── frontend/                 interface React (em construção)
+└── frontend/                 interface React (detalhes em frontend/README.md)
 ```
 
 Bibliotecas do backend:
@@ -148,10 +170,12 @@ Bibliotecas do backend:
 - **Partidas:** os 6 duelos são gravados com nomes, posições, condições e valores do momento. Editar ou vender um jogador não muda partidas passadas.
 - **Migrations:** o banco é criado só pelas migrations versionadas; não há script de dados de exemplo.
 - **CORS:** liberado somente para a origem em `CORS_ORIGIN`.
+- **Frontend:** valores em moeda com 2 casas e vírgula, e datas no horário de Brasília. Cada ação é enviada uma vez (botão desabilitado durante o envio, e um segundo clique é ignorado). Toda recusa mostra o `message` da API. Nenhum valor devolvido pela API é recalculado na tela, exceto a soma de valor e taxa para o custo total da compra. Responsividade: em 375 px o menu lateral vira um painel, e a página não tem rolagem horizontal.
 
 ## Funcionalidades não implementadas
 
-- Frontend: ainda não implementado.
+- Frontend: o menu "Ver detalhes" do jogador (painel lateral da foto 23 do mockup) e a prévia do campo na tela da partida (foto 64) não foram implementados.
+- Fidelidade visual ao Figma: as telas foram conferidas contra as capturas de referência da pasta `fotos/` (desktop). Não houve comparação direta com o arquivo do Figma, que não estava acessível. A versão em 375 px foi verificada pela largura da página, não contra o frame mobile do Figma.
 - Docker da API e do frontend: o `docker-compose.yml` atual sobe só o banco.
 
 Todos os endpoints da seção 2 do enunciado estão implementados no backend.
@@ -160,10 +184,10 @@ Todos os endpoints da seção 2 do enunciado estão implementados no backend.
 
 Ferramenta usada: **Claude Code** (CLI da Anthropic), com o modelo Claude.
 
-- **Onde:** no backend (código, testes e migrations), nesta documentação e, a seguir, no frontend.
+- **Onde:** no backend (código, testes e migrations), no frontend (código, testes e README) e nesta documentação.
 - **Como e por quê:** para escrever código e testes a partir do enunciado e do barema, conferindo as regras contra os exemplos do enunciado e revisando validações e tratamento de erros.
 - **Aceito:** a organização por módulos e as funções puras das regras de negócio.
 - **Alterado:** o corpo das requisições em consultas, exclusão e venda passou a ser ignorado, como pede V1, depois de um teste manual mostrar que JSON inválido ainda dava 400 nessas rotas. Um teste do próprio autor (potencial de jogador com 40 anos) também foi corrigido depois de uma falha, porque a regra estava certa e o teste não.
 - **Descartado:** (a confirmar pelo autor antes da entrega).
 
-Todo o código foi conferido contra o enunciado e executado nos testes descritos acima.
+Todo o código foi conferido contra o enunciado e executado nos testes descritos acima, no backend e no frontend.
