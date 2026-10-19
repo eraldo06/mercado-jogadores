@@ -8,7 +8,7 @@ import {
   Swords,
 } from 'lucide-react';
 import { useState, type ComponentType } from 'react';
-import { NavLink, Outlet, useLocation } from 'react-router';
+import { Link, NavLink, Outlet, useLocation } from 'react-router';
 import { useQueryClient } from '@tanstack/react-query';
 import { useClubes } from '../../consultas/clubes';
 import { useContagemJogadores } from '../../consultas/jogadores';
@@ -112,7 +112,11 @@ export function AppShell() {
           menuAberto ? 'flex' : 'hidden',
         )}
       >
-        <div className="flex items-center gap-3 px-2 pt-1">
+        <Link
+          to="/inicio"
+          aria-label="Passe, ir para a página inicial"
+          className="flex items-center gap-3 rounded-md px-2 pt-1 pb-1 transition-colors hover:bg-sidebar-accent"
+        >
           <span className="flex size-8 items-center justify-center rounded-lg bg-primary font-semibold text-primary-foreground">
             P
           </span>
@@ -122,7 +126,7 @@ export function AppShell() {
               Gestão da liga
             </span>
           </div>
-        </div>
+        </Link>
 
         <nav aria-label="Menu principal" className="flex flex-col gap-4">
           {secoes.map((secao) => (
@@ -245,7 +249,12 @@ export function AppShell() {
         </header>
 
         <main className="flex-1 p-4 md:p-6">
-          <div className="mx-auto flex min-w-0 max-w-6xl flex-col gap-6">
+          <div
+            className={cn(
+              'mx-auto flex min-w-0 flex-col gap-6',
+              localizacao.pathname === '/inicio' ? 'w-full' : 'max-w-6xl',
+            )}
+          >
             <Outlet />
           </div>
         </main>

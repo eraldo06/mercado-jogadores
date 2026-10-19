@@ -6,12 +6,14 @@ import { PaginaClubes } from './paginas/clubes/pagina-clubes';
 import { PaginaPartida } from './paginas/liga/pagina-partida';
 import { PaginaPartidas } from './paginas/liga/pagina-partidas';
 import { PaginaClassificacao } from './paginas/liga/pagina-classificacao';
+import { PaginaInicio } from './paginas/inicio/pagina-inicio';
 
 export default function App() {
   return (
     <Routes>
       <Route element={<AppShell />}>
         <Route index element={<Navigate to="/jogadores" replace />} />
+        <Route path="inicio" element={<PaginaInicio />} />
         <Route path="jogadores" element={<PaginaJogadores />} />
         <Route path="clubes" element={<PaginaClubes />} />
         <Route path="clubes/:id" element={<PaginaClube />} />

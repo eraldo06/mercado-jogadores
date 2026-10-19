@@ -30,7 +30,7 @@ npm ci
 npm run dev
 ```
 
-Abra `http://localhost:5173` no navegador. A tela inicial é a de jogadores.
+Abra `http://localhost:5173` no navegador. A tela inicial é a de jogadores; a página de apresentação fica em `/inicio`, clicando no logo Passe no topo do menu.
 
 Para gerar o build de produção (verificação de tipos e pacote em `dist/`):
 
