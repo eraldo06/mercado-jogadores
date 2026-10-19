@@ -165,3 +165,46 @@ export function textoFaixaValor(minimo?: string, maximo?: string): string {
     valor === undefined ? '—' : moeda(Number(valor));
   return `${formatar(minimo)} a ${formatar(maximo)}`;
 }
+
+export function legendaJogadores(
+  estado: EstadoJogadores,
+  primeiroResultado?: string,
+): string[] {
+  const linhas: string[] = [];
+  const busca = estado.busca.trim();
+  const temFiltro =
+    estado.posicao !== undefined ||
+    estado.condicao !== undefined ||
+    estado.clube !== undefined ||
+    estado.idadeMin !== undefined ||
+    estado.idadeMax !== undefined ||
+    estado.valorMin !== undefined ||
+    estado.valorMax !== undefined;
+
+  if (estado.aba === 'livres') {
+    linhas.push(
+      'Com a aba “Livres” ativa, o filtro por clube fica desabilitado, porque essa combinação não é aceita.',
+    );
+  }
+  if (busca !== '') {
+    const exemplo = primeiroResultado ? ` encontra “${primeiroResultado}”` : '';
+    linhas.push(
+      `“${busca}”${exemplo}: a busca procura o texto dentro do nome, sem diferenciar maiúsculas, minúsculas e acentos.`,
+    );
+  }
+  if (temFiltro) {
+    const valor =
+      estado.valorMin !== undefined || estado.valorMax !== undefined
+        ? ' A faixa de valor usa o valor de mercado, nunca o valor base.'
+        : '';
+    linhas.push(
+      `Os filtros se combinam: a lista mostra só quem atende a todos.${valor}`,
+    );
+  }
+  if (linhas.length === 0) {
+    linhas.push(
+      'Overall e valor de mercado são calculados a cada consulta. A busca ignora maiúsculas, minúsculas e acentos.',
+    );
+  }
+  return linhas;
+}

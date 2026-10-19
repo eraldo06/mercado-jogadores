@@ -37,6 +37,7 @@ import {
   filtrosAtivos,
   filtrosContagem,
   filtrosLista,
+  legendaJogadores,
   lerEstado,
   ROTULO_CONDICAO,
   ROTULO_ORDEM,
@@ -306,6 +307,12 @@ export function PaginaJogadores() {
             ) : undefined
           }
         />
+      </div>
+
+      <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+        {legendaJogadores(estado, lista.data?.data[0]?.name).map((linha) => (
+          <p key={linha}>{linha}</p>
+        ))}
       </div>
 
       {formulario?.modo === 'criar' && (

@@ -71,7 +71,7 @@ npm ci
 npm run dev
 ```
 
-A interface abre em **http://localhost:5173** (a tela inicial é a de jogadores). Para gerar o build de produção: `npm run build` e, para servir o build, `npm run preview` (porta 4173). Detalhes, bibliotecas e decisões do frontend estão em [frontend/README.md](frontend/README.md).
+A interface abre em **http://localhost:5173** (abre direto na tela de jogadores; a página de apresentação fica em `/inicio`, clicando no logo Passe no topo do menu). Para gerar o build de produção: `npm run build` e, para servir o build, `npm run preview` (porta 4173). Detalhes, bibliotecas e decisões do frontend estão em [frontend/README.md](frontend/README.md).
 
 ### Docker (banco, API e interface com um comando)
 
