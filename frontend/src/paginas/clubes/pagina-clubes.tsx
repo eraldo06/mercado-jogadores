@@ -187,8 +187,8 @@ export function PaginaClubes() {
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Patrimônio é a soma do caixa com o valor do elenco. Empates são
-        desfeitos pelo nome.
+        Clubes pelo nome por padrão ou pelo patrimônio, do maior para o menor,
+        com empate desfeito pelo nome.
       </p>
 
       {criando && (
