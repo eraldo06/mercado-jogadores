@@ -61,7 +61,7 @@ export function Select({
               <SelectPrimitivo.Item
                 key={opcao.valor}
                 value={opcao.valor}
-                className="relative flex cursor-default items-center rounded-md py-1.5 pr-8 pl-2 text-sm outline-none select-none focus:bg-accent focus:text-accent-foreground data-[disabled]:opacity-50"
+                className="relative flex cursor-pointer items-center rounded-md py-1.5 pr-8 pl-2 text-sm outline-none select-none focus:bg-accent focus:text-accent-foreground data-[disabled]:opacity-50"
               >
                 <SelectPrimitivo.ItemText>
                   {opcao.rotulo}
