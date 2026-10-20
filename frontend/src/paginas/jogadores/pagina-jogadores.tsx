@@ -62,7 +62,7 @@ function mensagemDeErro(erro: unknown): string {
   if (erro instanceof ErroApi) {
     return erro.message;
   }
-  return 'Não foi possível carregar os jogadores. Verifique a conexão e tente de novo.';
+  return 'Não foi possível carregar os dados. Verifique a conexão e tente de novo.';
 }
 
 type FormularioAberto =
@@ -286,13 +286,17 @@ export function PaginaJogadores() {
           linhas={lista.data?.data ?? []}
           chaveLinha={(jogador) => jogador.id}
           estado={estadoTabela}
+          tituloErro="Não foi possível carregar os jogadores"
           mensagemErro={mensagemDeErro(lista.error)}
           aoTentarNovamente={() => void lista.refetch()}
           vazio={
             filtrosAtivos(estado)
               ? {
                   icone: Search,
-                  titulo: 'Nenhum jogador encontrado',
+                  titulo:
+                    estado.busca.trim() !== ''
+                      ? `Nenhum jogador encontrado para “${estado.busca.trim()}”`
+                      : 'Nenhum jogador encontrado',
                   descricao:
                     'Confira a grafia ou tire alguns filtros. A busca ignora maiúsculas, minúsculas e acentos.',
                   acao: (

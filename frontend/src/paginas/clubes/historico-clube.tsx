@@ -330,7 +330,8 @@ export function HistoricoClube({ clubeId }: PropsHistorico) {
             linhas={historico.data?.data ?? []}
             chaveLinha={(t) => t.id}
             estado={estadoTabela}
-            mensagemErro="Não foi possível carregar o histórico. Verifique a conexão e tente de novo."
+            tituloErro="Não foi possível carregar o histórico"
+            mensagemErro="Não foi possível carregar o histórico. Os totais e a exportação ficam indisponíveis até a lista carregar."
             aoTentarNovamente={() => void historico.refetch()}
             vazio={{
               icone: History,

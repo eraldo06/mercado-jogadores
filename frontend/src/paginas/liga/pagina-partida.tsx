@@ -12,14 +12,8 @@ import { Skeleton } from '../../components/ui/skeleton';
 import { useClubes } from '../../consultas/clubes';
 import { usePartida } from '../../consultas/partidas';
 import { dataHoraBrasilia } from '../../lib/formatar';
-import { ROTULO_RESULTADO } from './rotulos-partida';
-
-const ROTULO_ATRIBUTO: Record<string, string> = {
-  shooting: 'Finalização',
-  passing: 'Passe',
-  dribbling: 'Drible',
-  defending: 'Defesa',
-};
+import { CampoPartida } from './campo-partida';
+import { ROTULO_ATRIBUTO, ROTULO_RESULTADO } from './rotulos-partida';
 
 function Lado({
   lado,
@@ -213,6 +207,8 @@ export function PaginaPartida() {
         </div>
         <Lado lado={comSigla(partida.away)} alinhamento="direita" />
       </section>
+
+      <CampoPartida partida={partida} />
 
       <section className="flex flex-col gap-3 rounded-xl border border-border bg-card">
         <div className="flex flex-col gap-0.5 p-4 pb-0">

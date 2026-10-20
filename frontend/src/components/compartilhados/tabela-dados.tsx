@@ -1,9 +1,8 @@
-import { RefreshCw, type LucideIcon } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { cn } from '../../lib/utils';
-import { Alert } from '../ui/alert';
-import { Button } from '../ui/button';
 import { Skeleton } from '../ui/skeleton';
+import { EstadoErro } from './estado-erro';
 import { EstadoVazio } from './estado-vazio';
 
 export type ColunaTabela<T> = {
@@ -27,6 +26,7 @@ type PropsTabelaDados<T> = {
     descricao?: string;
     acao?: ReactNode;
   };
+  tituloErro?: string;
   mensagemErro?: string;
   aoTentarNovamente?: () => void;
   quantidadeEsqueleto?: number;
@@ -46,6 +46,7 @@ export function TabelaDados<T>({
   chaveLinha,
   estado,
   vazio,
+  tituloErro = 'Não foi possível carregar os dados',
   mensagemErro = 'Não foi possível carregar os dados. Tente de novo.',
   aoTentarNovamente,
   quantidadeEsqueleto = 6,
@@ -61,22 +62,11 @@ export function TabelaDados<T>({
       )}
 
       {estado === 'erro' && (
-        <div className="p-4">
-          <Alert variante="destrutivo" titulo="Não foi possível carregar">
-            <p>{mensagemErro}</p>
-            {aoTentarNovamente && (
-              <Button
-                variante="outline"
-                tamanho="sm"
-                className="mt-2"
-                onClick={aoTentarNovamente}
-              >
-                <RefreshCw />
-                Tentar de novo
-              </Button>
-            )}
-          </Alert>
-        </div>
+        <EstadoErro
+          titulo={tituloErro}
+          descricao={mensagemErro}
+          aoTentarNovamente={aoTentarNovamente}
+        />
       )}
 
       {estado !== 'erro' && (

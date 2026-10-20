@@ -140,29 +140,33 @@ export function PaginaPartidas() {
       {ultima && (
         <section className="flex flex-col gap-3">
           <h2 className="text-sm text-muted-foreground">Última partida</h2>
-          <div className="flex flex-wrap items-center justify-center gap-6 rounded-xl border border-border bg-card p-6">
-            <div className="flex flex-col items-end">
-              <span className="font-semibold">{ultima.home.club_name}</span>
-              <span className="text-xs text-muted-foreground">Mandante</span>
-            </div>
-            <span className="flex size-14 items-center justify-center rounded-xl border border-border bg-muted text-sm font-semibold">
-              {sigla(ultima.home.club_id)}
-            </span>
-            <div className="flex flex-col items-center gap-2">
-              <span className="rounded-md bg-muted px-4 py-2 text-2xl font-semibold tabular-nums">
-                {ultima.home.goals} × {ultima.away.goals}
+          <div className="flex flex-wrap items-center gap-6 rounded-xl border border-border bg-card p-6">
+            <div className="flex flex-1 flex-wrap items-center justify-center gap-6">
+              <div className="flex flex-col items-end">
+                <span className="font-semibold">{ultima.home.club_name}</span>
+                <span className="text-xs text-muted-foreground">Mandante</span>
+              </div>
+              <span className="flex size-14 items-center justify-center rounded-xl border border-border bg-muted text-sm font-semibold">
+                {sigla(ultima.home.club_id)}
               </span>
-              <span className="text-xs text-muted-foreground tabular-nums">
-                {dataHoraBrasilia(ultima.played_at).replace(' ', ', ')}
+              <div className="flex flex-col items-center gap-2">
+                <span className="rounded-md bg-muted px-4 py-2 text-2xl font-semibold tabular-nums">
+                  {ultima.home.goals} × {ultima.away.goals}
+                </span>
+                <span className="text-xs text-muted-foreground tabular-nums">
+                  {dataHoraBrasilia(ultima.played_at).replace(' ', ', ')}
+                </span>
+                <Badge variante="neutro">
+                  {ROTULO_RESULTADO[ultima.result]}
+                </Badge>
+              </div>
+              <span className="flex size-14 items-center justify-center rounded-xl border border-border bg-muted text-sm font-semibold">
+                {sigla(ultima.away.club_id)}
               </span>
-              <Badge variante="neutro">{ROTULO_RESULTADO[ultima.result]}</Badge>
-            </div>
-            <span className="flex size-14 items-center justify-center rounded-xl border border-border bg-muted text-sm font-semibold">
-              {sigla(ultima.away.club_id)}
-            </span>
-            <div className="flex flex-col items-start">
-              <span className="font-semibold">{ultima.away.club_name}</span>
-              <span className="text-xs text-muted-foreground">Visitante</span>
+              <div className="flex flex-col items-start">
+                <span className="font-semibold">{ultima.away.club_name}</span>
+                <span className="text-xs text-muted-foreground">Visitante</span>
+              </div>
             </div>
             <Button asChild variante="outline">
               <Link to={`/partidas/${ultima.id}`}>
@@ -213,17 +217,24 @@ export function PaginaPartidas() {
           estado={
             lista.isPending ? 'carregando' : lista.isError ? 'erro' : 'pronto'
           }
+          tituloErro="Não foi possível carregar as partidas"
           mensagemErro={
             lista.error instanceof ErroApi
               ? lista.error.message
-              : 'Não foi possível carregar as partidas.'
+              : 'Não foi possível carregar os dados. Verifique a conexão e tente de novo.'
           }
           aoTentarNovamente={() => void lista.refetch()}
           vazio={{
             icone: Swords,
             titulo: 'Nenhuma partida jogada',
             descricao:
-              'Escolha dois clubes com escalação completa e jogue a primeira partida.',
+              'Escale os 5 titulares de dois clubes e jogue a primeira partida. O resultado aparece aqui e na classificação.',
+            acao: (
+              <Button variante="outline" onClick={() => setNovaAberta(true)}>
+                <Plus />
+                Nova partida
+              </Button>
+            ),
           }}
         />
         {partidas.length > 0 && (
@@ -234,8 +245,9 @@ export function PaginaPartidas() {
       </section>
 
       <p className="text-xs text-muted-foreground">
-        Partidas da mais recente para a mais antiga, com filtro por clube. “Ver
-        duelos” abre a partida.
+        {lista.isSuccess && partidas.length === 0
+          ? 'Nenhuma partida jogada ainda. A classificação continua com todos os clubes, zerados.'
+          : 'Partidas da mais recente para a mais antiga, com filtro por clube. “Ver duelos” abre a partida.'}
       </p>
 
       {novaAberta && (

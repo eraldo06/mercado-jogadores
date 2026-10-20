@@ -7,7 +7,8 @@ import {
   ShoppingCart,
   Shirt,
   Wallet,
-  ChevronLeft,
+  ArrowLeft,
+  SearchX,
   Users,
 } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
@@ -263,13 +264,19 @@ export function PaginaClube() {
   ) {
     return (
       <div className="flex flex-col items-center gap-3 rounded-xl border border-border bg-card px-6 py-16 text-center">
-        <p className="font-semibold">Clube não encontrado</p>
-        <p className="max-w-md text-sm text-muted-foreground">
-          O endereço pode estar errado ou o clube não existe.
-        </p>
+        <span className="flex size-12 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+          <SearchX className="size-5" aria-hidden="true" />
+        </span>
+        <div className="flex max-w-md flex-col gap-1">
+          <p className="font-semibold">Clube não encontrado</p>
+          <p className="text-sm text-muted-foreground">
+            Clube não encontrado. O endereço pode estar errado ou o clube não
+            existe.
+          </p>
+        </div>
         <Button asChild variante="outline">
           <Link to="/clubes">
-            <ChevronLeft />
+            <ArrowLeft />
             Voltar para clubes
           </Link>
         </Button>

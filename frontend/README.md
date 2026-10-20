@@ -130,4 +130,4 @@ Bibliotecas de desenvolvimento:
 
 ## 7. Funcionalidades não implementadas
 
-Nenhuma no frontend. Todas as telas do enunciado estão implementadas. A prévia do campo da partida (foto 64 do mockup) não foi feita.
+Nenhuma no frontend. Todas as telas do enunciado estão implementadas. A prévia "Em campo" da partida (foto 64 do mockup) usa só os dados dos 6 duelos devolvidos pela API, sem recalcular nada.

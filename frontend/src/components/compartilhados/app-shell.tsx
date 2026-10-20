@@ -298,11 +298,11 @@ export function AppShell() {
                   <span className={clubeDaRota ? '' : 'text-foreground'}>
                     {secaoAtual.titulo}
                   </span>
-                  {clubeDaRota && (
+                  {idDoClubeNaRota && (clubeDaRota || clubes.isSuccess) && (
                     <>
                       <span aria-hidden="true">›</span>
                       <span className="text-foreground">
-                        {clubeDaRota.name}
+                        {clubeDaRota?.name ?? `Clube ${idDoClubeNaRota}`}
                       </span>
                     </>
                   )}
