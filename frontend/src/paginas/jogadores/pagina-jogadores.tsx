@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router';
 import { toast } from 'sonner';
 import { ErroApi } from '../../api/cliente';
 import type { Jogador } from '../../api/jogadores';
+import { AvatarIniciais } from '../../components/compartilhados/avatar-iniciais';
 import { CabecalhoPagina } from '../../components/compartilhados/cabecalho-pagina';
 import { TabelaDados } from '../../components/compartilhados/tabela-dados';
 import { Button } from '../../components/ui/button';
@@ -20,12 +21,14 @@ import {
   useListaJogadores,
 } from '../../consultas/jogadores';
 import type { CompraResposta } from '../../api/mercado';
+import { moeda } from '../../lib/formatar';
 import { cn } from '../../lib/utils';
 import { BarraFiltros, ChipsFiltros } from './barra-filtros';
 import { Alert } from '../../components/ui/alert';
 import { Badge } from '../../components/ui/badge';
 import { ConfirmacaoDialog } from '../../components/compartilhados/confirmacao-dialog';
 import { DialogComprar } from './dialog-comprar';
+import { DrawerDetalhesJogador } from './drawer-detalhes-jogador';
 import { DialogCondicao } from './dialog-condicao';
 import { FormularioJogador } from './formulario-jogador';
 import { JogadorCadastradoDialog } from './jogador-cadastrado-dialog';
@@ -121,6 +124,11 @@ export function PaginaJogadores() {
       ),
     [listaClubes],
   );
+
+  const [detalhesDe, setDetalhesDe] = useState<Jogador | null>(null);
+  const detalhesAtual =
+    lista.data?.data.find((jogador) => jogador.id === detalhesDe?.id) ??
+    detalhesDe;
 
   const contagemDaAba: Record<AbaJogadores, number | undefined> = {
     todos: contTodos.data,
@@ -269,6 +277,7 @@ export function PaginaJogadores() {
 
         <TabelaDados
           colunas={colunasJogadores(clubesPorId, {
+            aoVerDetalhes: setDetalhesDe,
             aoEditar: abrirEditar,
             aoAlterarCondicao: abrirCondicao,
             aoComprar: abrirComprar,
@@ -314,6 +323,19 @@ export function PaginaJogadores() {
           <p key={linha}>{linha}</p>
         ))}
       </div>
+
+      <DrawerDetalhesJogador
+        jogador={detalhesAtual}
+        nomeDoClube={
+          detalhesAtual?.club_id == null
+            ? undefined
+            : clubesPorId.get(detalhesAtual.club_id)?.name
+        }
+        aoFechar={() => setDetalhesDe(null)}
+        aoEditar={abrirEditar}
+        aoAlterarCondicao={abrirCondicao}
+        aoComprar={abrirComprar}
+      />
 
       {formulario?.modo === 'criar' && (
         <FormularioJogador
@@ -380,7 +402,7 @@ export function PaginaJogadores() {
                 onSuccess: (jogador) => {
                   setCondicaoDe(null);
                   toast.success('Condição alterada', {
-                    description: `${jogador.name} agora está ${ROTULO_CONDICAO[jogador.condition]}.`,
+                    description: `${jogador.name} agora está ${ROTULO_CONDICAO[jogador.condition]}. Valor de mercado: ${moeda(jogador.market_value)}.`,
                   });
                 },
               },
@@ -444,12 +466,15 @@ export function PaginaJogadores() {
           }
         >
           <div className="flex items-center justify-between gap-3 rounded-lg border border-border bg-muted-subtle p-3">
-            <div className="flex flex-col">
-              <span className="font-medium">{excluirDe.name}</span>
-              <span className="text-xs text-muted-foreground">
-                {excluirDe.position} · {ROTULO_POSICAO[excluirDe.position]} ·{' '}
-                {excluirDe.age} anos
-              </span>
+            <div className="flex items-center gap-3">
+              <AvatarIniciais nome={excluirDe.name} chave={excluirDe.id} />
+              <div className="flex flex-col">
+                <span className="font-medium">{excluirDe.name}</span>
+                <span className="text-xs text-muted-foreground">
+                  {excluirDe.position} · {ROTULO_POSICAO[excluirDe.position]} ·{' '}
+                  {excluirDe.age} anos
+                </span>
+              </div>
             </div>
             <Badge>{excluirDe.club_id === null ? 'Livre' : 'Em clube'}</Badge>
           </div>

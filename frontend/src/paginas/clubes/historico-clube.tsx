@@ -234,6 +234,7 @@ export function HistoricoClube({ clubeId }: PropsHistorico) {
           erro instanceof ErroApi
             ? erro.message
             : 'Verifique a conexão e tente de novo.',
+        duration: Infinity,
       });
     } finally {
       setExportando(false);

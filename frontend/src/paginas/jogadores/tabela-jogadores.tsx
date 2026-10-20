@@ -17,6 +17,7 @@ export type ClubeNaTabela = {
 };
 
 type AcoesJogador = {
+  aoVerDetalhes: (jogador: Jogador) => void;
   aoEditar: (jogador: Jogador) => void;
   aoAlterarCondicao: (jogador: Jogador) => void;
   aoComprar: (jogador: Jogador) => void;
@@ -131,6 +132,7 @@ export function colunasJogadores(
           )}
           <MenuAcoesJogador
             jogador={jogador}
+            aoVerDetalhes={acoes.aoVerDetalhes}
             aoEditar={acoes.aoEditar}
             aoAlterarCondicao={acoes.aoAlterarCondicao}
             aoComprar={acoes.aoComprar}

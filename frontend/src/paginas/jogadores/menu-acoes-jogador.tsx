@@ -1,6 +1,7 @@
 import * as MenuPrimitivo from '@radix-ui/react-dropdown-menu';
 import {
   EllipsisVertical,
+  Eye,
   HeartPulse,
   Pencil,
   ShoppingCart,
@@ -11,6 +12,7 @@ import { cn } from '../../lib/utils';
 
 type PropsMenuAcoes = {
   jogador: Jogador;
+  aoVerDetalhes: (jogador: Jogador) => void;
   aoEditar: (jogador: Jogador) => void;
   aoAlterarCondicao: (jogador: Jogador) => void;
   aoComprar: (jogador: Jogador) => void;
@@ -19,6 +21,7 @@ type PropsMenuAcoes = {
 
 export function MenuAcoesJogador({
   jogador,
+  aoVerDetalhes,
   aoEditar,
   aoAlterarCondicao,
   aoComprar,
@@ -48,6 +51,13 @@ export function MenuAcoesJogador({
           </MenuPrimitivo.Label>
           <MenuPrimitivo.Item
             className={itemClasse}
+            onSelect={() => aoVerDetalhes(jogador)}
+          >
+            <Eye className="size-4" aria-hidden="true" />
+            Ver detalhes
+          </MenuPrimitivo.Item>
+          <MenuPrimitivo.Item
+            className={itemClasse}
             onSelect={() => aoEditar(jogador)}
           >
             <Pencil className="size-4" aria-hidden="true" />
@@ -60,6 +70,7 @@ export function MenuAcoesJogador({
             <HeartPulse className="size-4" aria-hidden="true" />
             Alterar condição
           </MenuPrimitivo.Item>
+          <MenuPrimitivo.Separator className="-mx-1 my-1 h-px bg-border" />
           <MenuPrimitivo.Item
             className={cn(itemClasse, 'data-[disabled]:opacity-50')}
             disabled={!livre}

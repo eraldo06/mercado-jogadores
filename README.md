@@ -192,7 +192,7 @@ Bibliotecas do backend:
 
 ## Funcionalidades não implementadas
 
-- Frontend: o menu "Ver detalhes" do jogador (painel lateral da foto 23 do mockup) e a prévia do campo na tela da partida (foto 64) não foram implementados.
+- Frontend: a prévia do campo na tela da partida (foto 64 do mockup) não foi implementada.
 - Fidelidade visual ao Figma: as telas foram conferidas contra as capturas de referência da pasta `fotos/` (desktop). Não houve comparação direta com o arquivo do Figma, que não estava acessível. A versão em 375 px foi verificada pela largura da página, não contra o frame mobile do Figma.
 
 Todos os endpoints da seção 2 do enunciado estão implementados no backend.

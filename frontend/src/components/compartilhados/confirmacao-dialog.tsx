@@ -1,3 +1,4 @@
+import { Trash2 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Button } from '../ui/button';
 import { Dialog } from '../ui/dialog';
@@ -45,6 +46,7 @@ export function ConfirmacaoDialog({
             carregando={carregando}
             onClick={aoConfirmar}
           >
+            {destrutiva && <Trash2 aria-hidden="true" />}
             {textoConfirmar}
           </Button>
         </>
