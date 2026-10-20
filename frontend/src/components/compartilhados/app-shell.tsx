@@ -176,12 +176,30 @@ export function AppShell() {
             <NavLink
               key={clube.id}
               to={`/clubes/${clube.id}`}
-              className="flex items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-sidebar-accent"
+              className={({ isActive }) =>
+                cn(
+                  'flex items-center gap-2 rounded-md border px-2 py-1.5 text-sm transition-colors',
+                  isActive
+                    ? 'border-sidebar-border bg-background font-medium text-sidebar-accent-foreground shadow-xs'
+                    : 'border-transparent hover:bg-sidebar-accent',
+                )
+              }
             >
-              <span className="flex size-5 items-center justify-center rounded border border-border bg-background text-[0.625rem] font-medium">
-                {clube.acronym[0]}
-              </span>
-              {clube.name}
+              {({ isActive }) => (
+                <>
+                  <span
+                    className={cn(
+                      'flex size-5 items-center justify-center rounded text-[0.625rem] font-medium',
+                      isActive
+                        ? 'bg-primary text-primary-foreground'
+                        : 'border border-border bg-background',
+                    )}
+                  >
+                    {clube.acronym[0]}
+                  </span>
+                  {clube.name}
+                </>
+              )}
             </NavLink>
           ))}
         </div>

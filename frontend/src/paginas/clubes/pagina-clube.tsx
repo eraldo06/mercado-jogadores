@@ -8,6 +8,7 @@ import {
   Shirt,
   Wallet,
   ChevronLeft,
+  Users,
 } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router';
@@ -18,6 +19,7 @@ import { BadgeMulta } from '../../components/compartilhados/badge-multa';
 import { CabecalhoPagina } from '../../components/compartilhados/cabecalho-pagina';
 import { CondicaoBadge } from '../../components/compartilhados/condicao-badge';
 import { EstadoErro } from '../../components/compartilhados/estado-erro';
+import { EstadoVazio } from '../../components/compartilhados/estado-vazio';
 import {
   TabelaDados,
   type ColunaTabela,
@@ -382,7 +384,25 @@ export function PaginaClube() {
         />
       </div>
 
-      {abaAtiva === 'elenco' && (
+      {abaAtiva === 'elenco' && jogadores.length === 0 && (
+        <div className="rounded-xl border border-border bg-card shadow-sm">
+          <EstadoVazio
+            icone={Shirt}
+            titulo="Nenhum jogador no elenco"
+            descricao="Compre jogadores livres para montar o elenco. O limite é de 12 jogadores, e o custo de cada compra não pode passar de 50% do caixa."
+            acao={
+              <Button variante="outline" asChild>
+                <Link to="/jogadores?aba=livres">
+                  <Users />
+                  Ver jogadores livres
+                </Link>
+              </Button>
+            }
+          />
+        </div>
+      )}
+
+      {abaAtiva === 'elenco' && jogadores.length > 0 && (
         <>
           <section className="flex flex-col gap-3">
             <div className="flex flex-col gap-0.5">
@@ -402,9 +422,7 @@ export function PaginaClube() {
               estado="pronto"
               vazio={{
                 icone: Shirt,
-                titulo: 'O clube ainda não tem jogadores',
-                descricao:
-                  'Compre jogadores livres para formar o elenco. O limite é de 12 jogadores, e o custo de cada compra não pode passar de 50% do caixa.',
+                titulo: 'Nenhum jogador no elenco',
               }}
             />
           </section>
