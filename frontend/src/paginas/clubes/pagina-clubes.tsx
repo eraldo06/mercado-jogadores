@@ -1,6 +1,6 @@
 import { ArrowUpDown, ChevronRight, Plus, Shield } from 'lucide-react';
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { toast } from 'sonner';
 import { ErroApi } from '../../api/cliente';
 import type { ClubeResumo, OrdemClubes } from '../../api/clubes';
@@ -48,7 +48,7 @@ const colunas: ColunaTabela<ClubeResumo>[] = [
   {
     chave: 'sigla',
     titulo: 'Sigla',
-    render: (clube) => <Badge className="font-mono">{clube.acronym}</Badge>,
+    render: (clube) => <Badge>{clube.acronym}</Badge>,
   },
   {
     chave: 'caixa',
@@ -83,7 +83,7 @@ const colunas: ColunaTabela<ClubeResumo>[] = [
     render: (clube) => (
       <Link
         to={`/clubes/${clube.id}`}
-        className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+        className="inline-flex h-8 items-center gap-1.5 rounded-lg px-3 text-sm font-medium hover:bg-accent"
       >
         Ver clube
         <ChevronRight className="size-4" aria-hidden="true" />
@@ -99,7 +99,9 @@ function mensagemDeErro(erro: unknown): string {
 
 export function PaginaClubes() {
   const [ordem, setOrdem] = useState<OrdemClubes>('name');
-  const [criando, setCriando] = useState(false);
+  // o formulário de novo clube fica na URL (?novo) para o "+" da barra lateral abrir também
+  const [parametros, setParametros] = useSearchParams();
+  const criando = parametros.has('novo');
   const lista = useListaClubes(ordem);
   const criar = useCriarClube();
   const navegar = useNavigate();
@@ -120,7 +122,7 @@ export function PaginaClubes() {
           <Button
             onClick={() => {
               criar.reset();
-              setCriando(true);
+              setParametros({ novo: '1' });
             }}
           >
             <Plus />
@@ -176,7 +178,10 @@ export function PaginaClubes() {
               descricao:
                 'Crie o primeiro clube com nome e sigla. Ele começa com 300,00 em caixa e sem jogadores.',
               acao: (
-                <Button variante="outline" onClick={() => setCriando(true)}>
+                <Button
+                  variante="outline"
+                  onClick={() => setParametros({ novo: '1' })}
+                >
                   <Plus />
                   Novo clube
                 </Button>
@@ -193,13 +198,13 @@ export function PaginaClubes() {
 
       {criando && (
         <FormularioClube
-          aoFechar={() => setCriando(false)}
+          aoFechar={() => setParametros({})}
           carregando={criar.isPending}
           erroApi={criar.error}
           aoSalvar={(dados) =>
             criar.mutate(dados, {
               onSuccess: (clube) => {
-                setCriando(false);
+                setParametros({});
                 toast.success('Clube criado', {
                   description: `${clube.name} (${clube.acronym}) começa com ${moeda(clube.cash)} em caixa.`,
                 });

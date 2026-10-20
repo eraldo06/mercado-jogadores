@@ -1,6 +1,7 @@
 import {
   CircleCheck,
   ClipboardList,
+  HeartPulse,
   Lock,
   Save,
   TriangleAlert,
@@ -74,17 +75,22 @@ function vagasDa(formacao: Formacao): Vaga[] {
 }
 
 // Atributos usados por posição (RN20): atacante usa o da posição; defensor usa a defesa.
-function atributosUsados(jogador: JogadorDoClube): string {
+function atributosUsados(
+  jogador: JogadorDoClube,
+): { rotulo: string; valor: number }[] {
   switch (jogador.position) {
     case 'GOL':
     case 'ZAG':
-      return `Defesa ${jogador.defending}`;
+      return [{ rotulo: 'Defesa', valor: jogador.defending }];
     case 'LAT':
-      return `Drible ${jogador.dribbling}  Defesa ${jogador.defending}`;
+      return [
+        { rotulo: 'Drible', valor: jogador.dribbling },
+        { rotulo: 'Defesa', valor: jogador.defending },
+      ];
     case 'MEI':
-      return `Passe ${jogador.passing}`;
+      return [{ rotulo: 'Passe', valor: jogador.passing }];
     case 'ATA':
-      return `Finalização ${jogador.shooting}`;
+      return [{ rotulo: 'Finalização', valor: jogador.shooting }];
   }
 }
 
@@ -123,6 +129,12 @@ const Y_DA_LINHA: Record<Grupo, number> = {
   GOL: 88,
 };
 
+// gramado com faixas de corte, como na foto 34
+const ESTILO_GRAMADO = {
+  backgroundImage:
+    'repeating-linear-gradient(to bottom, #1f6b3a 0 12.5%, #237a40 12.5% 25%)',
+};
+
 function CampoPrevia({
   vagas,
   escolhidos,
@@ -133,9 +145,17 @@ function CampoPrevia({
   jogadores: JogadorDoClube[];
 }) {
   return (
-    <div className="relative aspect-[3/4] w-full overflow-hidden rounded-lg bg-[#1f6b3a]">
+    <div
+      className="relative aspect-[3/4] w-full overflow-hidden rounded-lg bg-[#1f6b3a]"
+      style={ESTILO_GRAMADO}
+    >
       <div className="absolute inset-3 rounded-sm border-2 border-white/60" />
       <div className="absolute top-1/2 left-3 right-3 h-0.5 bg-white/60" />
+      <div className="absolute top-1/2 left-1/2 size-[22%] -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-white/60" />
+      <div className="absolute top-3 left-1/2 h-[16%] w-[52%] -translate-x-1/2 border-2 border-t-0 border-white/60" />
+      <div className="absolute top-3 left-1/2 h-[7%] w-[26%] -translate-x-1/2 border-2 border-t-0 border-white/60" />
+      <div className="absolute bottom-3 left-1/2 h-[16%] w-[52%] -translate-x-1/2 border-2 border-b-0 border-white/60" />
+      <div className="absolute bottom-3 left-1/2 h-[7%] w-[26%] -translate-x-1/2 border-2 border-b-0 border-white/60" />
       {LINHAS_DO_CAMPO.map((linha) => {
         const indices = vagas
           .map((v, i) => ({ v, i }))
@@ -151,13 +171,22 @@ function CampoPrevia({
             >
               <span
                 className={cn(
-                  'flex size-10 items-center justify-center rounded-full text-xs font-semibold',
+                  'relative flex size-10 items-center justify-center rounded-full text-xs font-semibold',
                   jogador
                     ? 'bg-primary text-primary-foreground'
                     : 'border-2 border-dashed border-white/80 text-white/80',
                 )}
               >
                 {jogador ? iniciais(jogador.name) : '+'}
+                {jogador?.condition === 'MAL_CONDICIONADO' && (
+                  <span
+                    className="absolute -top-1 -left-1 flex size-4 items-center justify-center rounded-full bg-warning text-white"
+                    aria-label="Mal condicionado"
+                    title="Mal condicionado"
+                  >
+                    <HeartPulse className="size-2.5" aria-hidden="true" />
+                  </span>
+                )}
               </span>
               <span className="rounded bg-black/60 px-1.5 py-0.5 text-[11px] text-white">
                 {jogador ? sobrenome(jogador.name) : v.rotulo}
@@ -176,7 +205,12 @@ function MiniCampo({ formacao }: { formacao: Formacao }) {
     (n) => n > 0,
   );
   return (
-    <div className="flex size-9 shrink-0 flex-col justify-between rounded bg-[#1f6b3a] p-1">
+    <div
+      className="relative flex size-9 shrink-0 flex-col justify-between overflow-hidden rounded bg-[#1f6b3a] p-1"
+      style={ESTILO_GRAMADO}
+    >
+      <div className="absolute inset-0.5 rounded-[2px] border border-white/60" />
+      <div className="absolute top-1/2 right-0 left-0 h-px bg-white/60" />
       {linhas.map((n, i) => (
         <div key={i} className="flex justify-around">
           {Array.from({ length: n }, (_, j) => (
@@ -421,8 +455,21 @@ function FormularioEscalacao({
                       <td className="px-4 py-3 text-right font-semibold tabular-nums">
                         {atual?.overall ?? ''}
                       </td>
-                      <td className="px-4 py-3 text-muted-foreground">
-                        {atual && atributosUsados(atual)}
+                      <td className="px-4 py-3">
+                        {atual &&
+                          atributosUsados(atual).map(({ rotulo, valor }) => (
+                            <span
+                              key={rotulo}
+                              className="mr-3 whitespace-nowrap"
+                            >
+                              <span className="text-muted-foreground">
+                                {rotulo}
+                              </span>{' '}
+                              <span className="font-medium text-foreground tabular-nums">
+                                {valor}
+                              </span>
+                            </span>
+                          ))}
                       </td>
                     </tr>
                   );
@@ -511,9 +558,23 @@ function FormularioEscalacao({
                   >
                     <div className="flex items-center justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <AvatarIniciais nome={j.name} chave={j.id} />
+                        <AvatarIniciais
+                          nome={j.name}
+                          chave={j.id}
+                          className={cn(
+                            j.condition === 'DOENTE' && 'opacity-50 grayscale',
+                          )}
+                        />
                         <div className="flex flex-col">
-                          <span className="text-sm font-medium">{j.name}</span>
+                          <span
+                            className={cn(
+                              'text-sm font-medium',
+                              j.condition === 'DOENTE' &&
+                                'text-muted-foreground',
+                            )}
+                          >
+                            {j.name}
+                          </span>
                           <span className="text-xs text-muted-foreground">
                             {j.position}
                           </span>
@@ -522,7 +583,7 @@ function FormularioEscalacao({
                       <CondicaoBadge condicao={j.condition} />
                     </div>
                     {j.condition === 'DOENTE' && (
-                      <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1.5 rounded-md bg-muted px-2 py-1.5 text-xs text-muted-foreground">
                         <Lock className="size-3" aria-hidden="true" />
                         Doente não pode ser escalado.
                       </span>

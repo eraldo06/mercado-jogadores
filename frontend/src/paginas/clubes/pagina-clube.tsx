@@ -69,9 +69,7 @@ function criarColunasElenco(
     {
       chave: 'posicao',
       titulo: 'Posição',
-      render: (jogador) => (
-        <Badge className="font-mono">{jogador.position}</Badge>
-      ),
+      render: (jogador) => <Badge>{jogador.position}</Badge>,
     },
     {
       chave: 'overall',
@@ -114,8 +112,13 @@ function criarColunasElenco(
       titulo: 'Fim da fidelidade',
       render: (jogador) =>
         jogador.contract ? (
-          <span className="tabular-nums">
-            {dataHoraBrasilia(jogador.contract.loyalty_until)}
+          <span className="flex flex-col tabular-nums">
+            <span>
+              {dataHoraBrasilia(jogador.contract.loyalty_until).split(' ')[0]}
+            </span>
+            <span className="text-xs text-muted-foreground">
+              {dataHoraBrasilia(jogador.contract.loyalty_until).split(' ')[1]}
+            </span>
           </span>
         ) : (
           '—'
@@ -223,7 +226,11 @@ function AbaClube({
       <Icone className="size-4" aria-hidden="true" />
       {rotulo}
       {contagem !== undefined && (
-        <span className="rounded-full bg-muted px-2 text-xs tabular-nums">
+        <span
+          className={`rounded-full px-2 text-xs tabular-nums ${
+            ativa ? 'bg-primary-soft text-[#1447E6]' : 'bg-muted'
+          }`}
+        >
           {contagem}
         </span>
       )}
@@ -306,7 +313,11 @@ export function PaginaClube() {
   return (
     <div className="flex flex-col gap-6">
       <CabecalhoPagina
-        icone={Shirt}
+        marca={
+          <span className="flex size-12 items-center justify-center rounded-xl border border-border bg-muted text-sm font-semibold">
+            {clube.acronym}
+          </span>
+        }
         titulo={clube.name}
         descricao={undefined}
         acao={
@@ -320,7 +331,9 @@ export function PaginaClube() {
       />
 
       <div className="flex flex-wrap items-center gap-2 text-sm">
-        <Badge>Sigla {clube.acronym}</Badge>
+        <Badge className="border border-border bg-background">
+          Sigla {clube.acronym}
+        </Badge>
         <Badge>
           {jogadores.length} de {LIMITE_ELENCO} jogadores
         </Badge>
@@ -359,7 +372,7 @@ export function PaginaClube() {
       <div
         role="tablist"
         aria-label="Seções do clube"
-        className="flex gap-4 overflow-x-auto border-b border-border md:gap-6"
+        className="flex gap-4 overflow-x-auto overflow-y-hidden border-b border-border md:gap-6"
       >
         <AbaClube
           ativa={abaAtiva === 'elenco'}
@@ -405,14 +418,16 @@ export function PaginaClube() {
       {abaAtiva === 'elenco' && jogadores.length > 0 && (
         <>
           <section className="flex flex-col gap-3">
-            <div className="flex flex-col gap-0.5">
-              <h2 className="text-base font-semibold">Elenco</h2>
-              <p className="text-sm text-muted-foreground">
-                Ordem por posição (GOL, ZAG, LAT, MEI, ATA), depois pelo nome.
-                Contrato calculado para uma venda agora.
-              </p>
-            </div>
             <TabelaDados
+              cabecalho={
+                <div className="flex flex-col gap-0.5">
+                  <h2 className="text-base font-semibold">Elenco</h2>
+                  <p className="text-xs text-muted-foreground">
+                    Ordem por posição (GOL, ZAG, LAT, MEI, ATA), depois pelo
+                    nome. Contrato calculado para uma venda agora.
+                  </p>
+                </div>
+              }
               colunas={criarColunasElenco((jogador) => {
                 vender.reset();
                 setVendaDe(jogador);

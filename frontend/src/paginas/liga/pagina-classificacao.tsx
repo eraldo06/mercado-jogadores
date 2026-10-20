@@ -1,4 +1,4 @@
-import { ChevronRight, ListOrdered, Plus } from 'lucide-react';
+import { ArrowRight, ListOrdered, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { toast } from 'sonner';
@@ -221,7 +221,7 @@ export function PaginaClassificacao() {
               className="inline-flex items-center gap-1 text-sm font-medium text-primary"
             >
               Ver todas as partidas
-              <ChevronRight className="size-4" aria-hidden="true" />
+              <ArrowRight className="size-4" aria-hidden="true" />
             </Link>
           </section>
 

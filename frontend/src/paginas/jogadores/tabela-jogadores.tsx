@@ -47,9 +47,7 @@ export function colunasJogadores(
     {
       chave: 'posicao',
       titulo: 'Posição',
-      render: (jogador) => (
-        <Badge className="font-mono">{jogador.position}</Badge>
-      ),
+      render: (jogador) => <Badge>{jogador.position}</Badge>,
     },
     {
       chave: 'overall',
@@ -110,7 +108,7 @@ export function colunasJogadores(
             </span>
             <Link
               to={`/clubes/${jogador.club_id}`}
-              className="underline underline-offset-2"
+              className="whitespace-nowrap underline underline-offset-2"
             >
               {clube?.name ?? `Clube ${jogador.club_id}`}
             </Link>

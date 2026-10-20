@@ -1,6 +1,9 @@
 import {
+  Clock,
   ListOrdered,
   Menu,
+  PanelLeft,
+  Plus,
   RefreshCw,
   Shield,
   Trophy,
@@ -85,9 +88,14 @@ export function AppShell() {
   const partidas = usePartidas();
 
   const [menuAberto, setMenuAberto] = useState(false);
+  const [menuRecolhido, setMenuRecolhido] = useState(false);
   const secaoAtual = secoesDoCaminho.find((secao) =>
     localizacao.pathname.startsWith(secao.prefixo),
   );
+  const idDoClubeNaRota = /^\/clubes\/(\d+)/.exec(localizacao.pathname)?.[1];
+  const clubeDaRota = idDoClubeNaRota
+    ? clubes.data?.find((clube) => clube.id === Number(idDoClubeNaRota))
+    : undefined;
   const ultimaPartida = partidas.data?.[0];
   const secoes = secoesDaSidebar({
     jogadores: totalJogadores.data,
@@ -108,8 +116,9 @@ export function AppShell() {
       <aside
         onClick={() => setMenuAberto(false)}
         className={cn(
-          'fixed inset-y-0 left-0 z-40 w-64 max-w-[85vw] shrink-0 flex-col gap-5 overflow-y-auto border-r border-sidebar-border bg-sidebar p-3 text-sidebar-foreground md:sticky md:top-0 md:z-auto md:flex md:h-screen',
+          'fixed inset-y-0 left-0 z-40 w-64 max-w-[85vw] shrink-0 flex-col gap-5 overflow-hidden border-r border-sidebar-border bg-sidebar p-3 text-sidebar-foreground md:sticky md:top-0 md:z-auto md:flex md:h-screen',
           menuAberto ? 'flex' : 'hidden',
+          menuRecolhido && 'md:hidden',
         )}
       >
         <Link
@@ -165,8 +174,17 @@ export function AppShell() {
           ))}
         </nav>
 
-        <div className="flex flex-col gap-1">
-          <span className="px-2 text-xs text-muted-foreground">Clubes</span>
+        <div className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
+          <div className="flex items-center justify-between px-2">
+            <span className="text-xs text-muted-foreground">Clubes</span>
+            <Link
+              to="/clubes?novo"
+              aria-label="Novo clube"
+              className="flex size-5 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-sidebar-accent hover:text-foreground"
+            >
+              <Plus className="size-4" aria-hidden="true" />
+            </Link>
+          </div>
           {clubes.data?.length === 0 && (
             <span className="px-2 text-xs text-muted-foreground">
               Nenhum clube ainda.
@@ -204,12 +222,14 @@ export function AppShell() {
           ))}
         </div>
 
-        <div className="mt-auto flex flex-col gap-3 rounded-lg border border-border bg-card p-3 text-sm">
-          <div className="flex items-center gap-2">
-            <Trophy
-              className="size-4 text-muted-foreground"
-              aria-hidden="true"
-            />
+        <div className="mt-auto flex shrink-0 flex-col gap-2.5 rounded-xl border border-border bg-background p-3 text-sm shadow-xs">
+          <div className="flex items-center gap-2.5">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted">
+              <Trophy
+                className="size-4 text-muted-foreground"
+                aria-hidden="true"
+              />
+            </span>
             <div className="flex flex-col">
               <span className="font-medium">Liga Fictícia 2026</span>
               <span className="text-xs text-muted-foreground">
@@ -218,15 +238,25 @@ export function AppShell() {
               </span>
             </div>
           </div>
-          <div className="flex flex-col">
-            <span className="font-medium">Última partida</span>
-            <span className="text-xs text-muted-foreground">
-              {ultimaPartida
-                ? `${ultimaPartida.home.club_name} ${ultimaPartida.home.goals} × ${ultimaPartida.away.goals} ${ultimaPartida.away.club_name}`
-                : 'nenhuma ainda'}
+          <div className="flex items-center gap-2.5">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-muted">
+              <Swords
+                className="size-4 text-muted-foreground"
+                aria-hidden="true"
+              />
             </span>
+            <div className="flex flex-col">
+              <span className="font-medium">Última partida</span>
+              <span className="text-xs text-muted-foreground">
+                {ultimaPartida
+                  ? `${ultimaPartida.home.club_name} ${ultimaPartida.home.goals} × ${ultimaPartida.away.goals} ${ultimaPartida.away.club_name}`
+                  : 'nenhuma ainda'}
+              </span>
+            </div>
           </div>
-          <span className="text-xs text-muted-foreground">
+          <div className="h-px bg-border" aria-hidden="true" />
+          <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+            <Clock className="size-4" aria-hidden="true" />
             Horário de Brasília (UTC−3)
           </span>
         </div>
@@ -244,18 +274,42 @@ export function AppShell() {
           >
             <Menu />
           </Button>
-          <nav
-            aria-label="Caminho"
-            className="flex min-w-0 items-center gap-2 truncate text-sm text-muted-foreground"
-          >
-            {secaoAtual && (
-              <>
-                <span>{secaoAtual.grupo}</span>
-                <span aria-hidden="true">›</span>
-                <span className="text-foreground">{secaoAtual.titulo}</span>
-              </>
-            )}
-          </nav>
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="hidden items-center gap-3 md:flex">
+              <Button
+                variante="ghost"
+                tamanho="icone"
+                aria-label={menuRecolhido ? 'Mostrar menu' : 'Recolher menu'}
+                aria-expanded={!menuRecolhido}
+                onClick={() => setMenuRecolhido((recolhido) => !recolhido)}
+              >
+                <PanelLeft />
+              </Button>
+              <span className="h-4 w-px bg-border" aria-hidden="true" />
+            </div>
+            <nav
+              aria-label="Caminho"
+              className="flex min-w-0 items-center gap-2 truncate text-sm text-muted-foreground"
+            >
+              {secaoAtual && (
+                <>
+                  <span>{secaoAtual.grupo}</span>
+                  <span aria-hidden="true">›</span>
+                  <span className={clubeDaRota ? '' : 'text-foreground'}>
+                    {secaoAtual.titulo}
+                  </span>
+                  {clubeDaRota && (
+                    <>
+                      <span aria-hidden="true">›</span>
+                      <span className="text-foreground">
+                        {clubeDaRota.name}
+                      </span>
+                    </>
+                  )}
+                </>
+              )}
+            </nav>
+          </div>
           <Button
             variante="ghost"
             tamanho="icone"
@@ -267,12 +321,7 @@ export function AppShell() {
         </header>
 
         <main className="flex-1 p-4 md:p-6">
-          <div
-            className={cn(
-              'mx-auto flex min-w-0 flex-col gap-6',
-              localizacao.pathname === '/inicio' ? 'w-full' : 'max-w-6xl',
-            )}
-          >
+          <div className="mx-auto flex w-full min-w-0 flex-col gap-6">
             <Outlet />
           </div>
         </main>

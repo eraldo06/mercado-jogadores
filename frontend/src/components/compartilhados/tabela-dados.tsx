@@ -31,6 +31,7 @@ type PropsTabelaDados<T> = {
   aoTentarNovamente?: () => void;
   quantidadeEsqueleto?: number;
   rodape?: ReactNode;
+  cabecalho?: ReactNode;
 };
 
 const alinhamentoClasse = {
@@ -49,11 +50,16 @@ export function TabelaDados<T>({
   aoTentarNovamente,
   quantidadeEsqueleto = 6,
   rodape,
+  cabecalho,
 }: PropsTabelaDados<T>) {
   const semLinhas = estado === 'pronto' && linhas.length === 0;
 
   return (
     <div className="flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+      {cabecalho && (
+        <div className="border-b border-border px-4 py-3">{cabecalho}</div>
+      )}
+
       {estado === 'erro' && (
         <div className="p-4">
           <Alert variante="destrutivo" titulo="Não foi possível carregar">
