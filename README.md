@@ -192,7 +192,6 @@ Bibliotecas do backend:
 
 ## Funcionalidades não implementadas
 
-- Frontend: a prévia do campo na tela da partida (foto 64 do mockup) não foi implementada.
 - Fidelidade visual ao Figma: as telas foram conferidas contra as capturas de referência da pasta `fotos/` (desktop). Não houve comparação direta com o arquivo do Figma, que não estava acessível. A versão em 375 px foi verificada pela largura da página, não contra o frame mobile do Figma.
 
 Todos os endpoints da seção 2 do enunciado estão implementados no backend.
