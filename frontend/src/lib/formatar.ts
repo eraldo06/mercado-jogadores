@@ -8,7 +8,7 @@ export function moeda(valor: number): string {
 }
 
 export function moedaComSinal(valor: number): string {
-  const sinal = valor > 0 ? '+' : valor < 0 ? '−' : '';
+  const sinal = valor > 0 ? '+' : valor < 0 ? '-' : '';
   return `${sinal}${formatoMoeda.format(Math.abs(valor))}`;
 }
 
@@ -23,8 +23,4 @@ export function dataHoraBrasilia(iso: string): string {
   }
   const [, ano, mes, dia, hora, minuto] = partes;
   return `${dia}/${mes}/${ano} ${hora}:${minuto}`;
-}
-
-export function dataBrasilia(iso: string): string {
-  return dataHoraBrasilia(iso).slice(0, 10);
 }

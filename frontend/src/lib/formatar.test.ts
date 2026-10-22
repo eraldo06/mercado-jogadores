@@ -1,10 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  dataBrasilia,
-  dataHoraBrasilia,
-  moeda,
-  moedaComSinal,
-} from './formatar';
+import { dataHoraBrasilia, moeda, moedaComSinal } from './formatar';
 
 describe('formatação de moeda', () => {
   it('usa vírgula e duas casas', () => {
@@ -14,7 +9,7 @@ describe('formatação de moeda', () => {
 
   it('mostra sinal de mais e de menos com o traço do enunciado', () => {
     expect(moedaComSinal(7.8)).toBe('+7,80');
-    expect(moedaComSinal(-4.8)).toBe('−4,80');
+    expect(moedaComSinal(-4.8)).toBe('-4,80');
     expect(moedaComSinal(0)).toBe('0,00');
   });
 });
@@ -24,7 +19,6 @@ describe('formatação de data no horário de Brasília', () => {
     expect(dataHoraBrasilia('2026-11-11T20:00:00-03:00')).toBe(
       '11/11/2026 20:00',
     );
-    expect(dataBrasilia('2026-11-11T20:00:00-03:00')).toBe('11/11/2026');
   });
 
   it('devolve o texto original quando não reconhece o formato', () => {

@@ -72,10 +72,6 @@ export const jogadoresApi = {
     });
   },
 
-  buscar(id: number): Promise<Jogador> {
-    return requisitar<Jogador>(`/players/${id}`);
-  },
-
   criar(dados: NovoJogador): Promise<Jogador> {
     return requisitar<Jogador>('/players', { metodo: 'POST', corpo: dados });
   },

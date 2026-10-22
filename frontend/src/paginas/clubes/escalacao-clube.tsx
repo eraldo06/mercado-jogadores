@@ -1,4 +1,5 @@
 import {
+  CircleAlert,
   CircleCheck,
   ClipboardList,
   HeartPulse,
@@ -129,7 +130,7 @@ const Y_DA_LINHA: Record<Grupo, number> = {
   GOL: 88,
 };
 
-// gramado com faixas de corte, como na foto 34
+// Faixas de corte do gramado, como em campos de futebol reais.
 const ESTILO_GRAMADO = {
   backgroundImage:
     'repeating-linear-gradient(to bottom, #1f6b3a 0 12.5%, #237a40 12.5% 25%)',
@@ -246,6 +247,7 @@ function FormularioEscalacao({
 
   const vagas = vagasDa(formacao);
   const completa = escalacaoValida(formacao, escolhidos);
+  const vagasVazias = vagas.filter((_, i) => escolhidos[i] === null);
   const erroDaApi =
     salvar.error instanceof ErroApi ? salvar.error.message : undefined;
   const erroDeRede = salvar.error && !(salvar.error instanceof ErroApi);
@@ -329,6 +331,18 @@ function FormularioEscalacao({
               </Badge>
             )}
           </div>
+
+          {!completa && salvaCompleta && (
+            <p className="flex items-start gap-1.5 px-4 pb-4 text-xs text-destructive-soft-foreground">
+              <CircleAlert
+                className="mt-px size-3.5 shrink-0"
+                aria-hidden="true"
+              />
+              {vagasVazias.length === vagas.length
+                ? 'Escolha um titular para cada vaga da formação.'
+                : `Faltam titulares em: ${vagasVazias.map((v) => v.rotulo).join(', ')}.`}
+            </p>
+          )}
 
           {(erroDaApi || erroDeRede) && (
             <div className="flex flex-col gap-3 px-4 pb-4">

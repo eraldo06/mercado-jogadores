@@ -123,9 +123,6 @@ export function edicaoSchema(idadeAtual: number) {
     });
 }
 
-export type CadastroValidado = z.infer<typeof cadastroSchema>;
-export type EdicaoValidada = z.infer<ReturnType<typeof edicaoSchema>>;
-
 export type ErrosFormulario = Partial<Record<string, string>>;
 
 function errosDe(emitidos: z.ZodError): ErrosFormulario {

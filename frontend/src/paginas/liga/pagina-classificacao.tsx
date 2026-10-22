@@ -6,6 +6,7 @@ import { ErroApi } from '../../api/cliente';
 import type { LinhaClassificacao } from '../../api/liga';
 import { CabecalhoPagina } from '../../components/compartilhados/cabecalho-pagina';
 import { EstadoErro } from '../../components/compartilhados/estado-erro';
+import { EstadoVazio } from '../../components/compartilhados/estado-vazio';
 import { Button } from '../../components/ui/button';
 import { Skeleton } from '../../components/ui/skeleton';
 import { useClubes } from '../../consultas/clubes';
@@ -18,10 +19,10 @@ import { dataHoraBrasilia } from '../../lib/formatar';
 import { cn } from '../../lib/utils';
 import { DialogNovaPartida } from './dialog-nova-partida';
 
-// A API devolve a ordem final; a tela só exibe. Saldo com sinal: +2, −2, 0.
+// A API devolve a ordem final; a tela só exibe. Saldo com sinal: +2, -2, 0.
 function saldoComSinal(saldo: number): string {
   if (saldo > 0) return `+${saldo}`;
-  if (saldo < 0) return `−${Math.abs(saldo)}`;
+  if (saldo < 0) return `-${Math.abs(saldo)}`;
   return '0';
 }
 
@@ -149,6 +150,12 @@ export function PaginaClassificacao() {
                   : 'Verifique a conexão e tente de novo.'
               }
               aoTentarNovamente={() => void classificacao.refetch()}
+            />
+          ) : classificacao.data.length === 0 ? (
+            <EstadoVazio
+              icone={ListOrdered}
+              titulo="Nenhum clube na classificação"
+              descricao="Cadastre clubes e jogue partidas para ver a tabela de classificação."
             />
           ) : (
             <>
