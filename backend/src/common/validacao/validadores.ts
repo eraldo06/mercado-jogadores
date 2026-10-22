@@ -126,9 +126,7 @@ export function OrdenacaoJogador(
             return false;
           }
           const criterios = valor.split(',');
-          const campos = criterios.map(
-            (criterio) => criterio.split('_')[0],
-          );
+          const campos = criterios.map((criterio) => criterio.split('_')[0]);
           return (
             criterios.length <= 2 &&
             new Set(campos).size === campos.length &&
