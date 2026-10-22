@@ -126,9 +126,12 @@ export function OrdenacaoJogador(
             return false;
           }
           const criterios = valor.split(',');
+          const campos = criterios.map(
+            (criterio) => criterio.split('_')[0],
+          );
           return (
             criterios.length <= 2 &&
-            new Set(criterios).size === criterios.length &&
+            new Set(campos).size === campos.length &&
             criterios.every((criterio) => ORDENACOES_JOGADOR.includes(criterio))
           );
         },

@@ -184,7 +184,7 @@ Bibliotecas do backend:
 - **Datas:** entrada no formato `AAAA-MM-DDTHH:MM-03:00`, com data e hora conferidas (ex.: 30 de fevereiro é recusado). Saída em `AAAA-MM-DDTHH:MM:SS-03:00`.
 - **Texto:** espaços das pontas são removidos e espaços repetidos viram um. Caracteres de controle são recusados. Nome de clube é único sem diferenciar maiúsculas, mas com acento. A sigla também é única.
 - **Escalação:** a formação fica salva no clube (coluna `clubes.formacao`, adicional ao enunciado). Titular que é vendido ou passa a `DOENTE` sai da escalação, e o clube só volta a jogar quando escala de novo.
-- **Ordenação com dois critérios:** `sort` aceita até dois valores separados por vírgula. Repetir o mesmo campo recusa com `400` (ex.: `name,name`). A combinação de direções opostas do mesmo campo (`value_asc,value_desc`) é aceita.
+- **Ordenação com dois critérios:** `sort` aceita até dois valores separados por vírgula. Repetir o mesmo campo recusa com `400`, inclusive em direções opostas (ex.: `name,name` e `value_asc,value_desc`), como no exemplo do enunciado.
 - **Partidas:** os 6 duelos são gravados com nomes, posições, condições e valores do momento. Editar ou vender um jogador não muda partidas passadas.
 - **Migrations:** o banco é criado só pelas migrations versionadas; não há script de dados de exemplo.
 - **CORS:** liberado somente para a origem em `CORS_ORIGIN`.
